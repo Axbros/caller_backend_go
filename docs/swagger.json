@@ -1,0 +1,4919 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "http server api docs",
+        "title": "caller api docs",
+        "contact": {},
+        "version": "2.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/api/v1/callHistory": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "submit information to create callHistory",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "create callHistory",
+                "parameters": [
+                    {
+                        "description": "callHistory information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateCallHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateCallHistoryRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/callHistory/condition": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get callHistory by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "get callHistory by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetCallHistoryByConditionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/callHistory/delete/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete callHistorys by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "delete callHistorys",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteCallHistorysByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteCallHistorysByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/callHistory/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of callHistorys by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "list of callHistorys by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "last id, default is MaxInt32",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListCallHistorysRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of callHistorys by paging and conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "list of callHistorys by query parameters",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListCallHistorysRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/callHistory/list/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of callHistorys by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "list of callHistorys by batch id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListCallHistorysByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListCallHistorysByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/callHistory/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get callHistory detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "get callHistory detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetCallHistoryByIDRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update callHistory information by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "update callHistory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "callHistory information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateCallHistoryByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateCallHistoryByIDRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete callHistory by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callHistory"
+                ],
+                "summary": "delete callHistory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteCallHistoryByIDRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/clients": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "submit information to create clients",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "create clients",
+                "parameters": [
+                    {
+                        "description": "clients information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateClientsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateClientsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/clients/condition": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get clients by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "get clients by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetClientsByConditionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/clients/delete/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete clientss by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "delete clientss",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteClientssByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteClientssByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/clients/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of clientss by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "list of clientss by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "last id, default is MaxInt32",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListClientssRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of clientss by paging and conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "list of clientss by query parameters",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListClientssRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/clients/list/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of clientss by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "list of clientss by batch id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListClientssByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListClientssByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/clients/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get clients detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "get clients detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetClientsByIDRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update clients information by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "update clients",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "clients information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateClientsByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateClientsByIDRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete clients by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "delete clients",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteClientsByIDRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/distribution": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "submit information to create distribution",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "create distribution",
+                "parameters": [
+                    {
+                        "description": "distribution information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateDistributionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateDistributionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/distribution/condition": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get distribution by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "get distribution by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetDistributionByConditionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/distribution/delete/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete distributions by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "delete distributions",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteDistributionsByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteDistributionsByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/distribution/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of distributions by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "list of distributions by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "last id, default is MaxInt32",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListDistributionsRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of distributions by paging and conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "list of distributions by query parameters",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListDistributionsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/distribution/list/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of distributions by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "list of distributions by batch id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListDistributionsByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListDistributionsByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/distribution/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get distribution detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "get distribution detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetDistributionByIDRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update distribution information by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "update distribution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "distribution information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateDistributionByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateDistributionByIDRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete distribution by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "summary": "delete distribution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteDistributionByIDRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupCall": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "submit information to create groupCall",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "create groupCall",
+                "parameters": [
+                    {
+                        "description": "groupCall information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateGroupCallRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateGroupCallRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupCall/condition": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get groupCall by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "get groupCall by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetGroupCallByConditionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupCall/delete/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete groupCalls by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "delete groupCalls",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteGroupCallsByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteGroupCallsByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupCall/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of groupCalls by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "list of groupCalls by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "last id, default is MaxInt32",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListGroupCallsRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of groupCalls by paging and conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "list of groupCalls by query parameters",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListGroupCallsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupCall/list/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of groupCalls by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "list of groupCalls by batch id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListGroupCallsByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListGroupCallsByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupCall/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get groupCall detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "get groupCall detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetGroupCallByIDRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update groupCall information by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "update groupCall",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "groupCall information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateGroupCallByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateGroupCallByIDRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete groupCall by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupCall"
+                ],
+                "summary": "delete groupCall",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteGroupCallByIDRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupClient": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "submit information to create groupClient",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "create groupClient",
+                "parameters": [
+                    {
+                        "description": "groupClient information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateGroupClientRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateGroupClientRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupClient/condition": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get groupClient by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "get groupClient by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetGroupClientByConditionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupClient/delete/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete groupClients by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "delete groupClients",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteGroupClientsByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteGroupClientsByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupClient/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of groupClients by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "list of groupClients by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "last id, default is MaxInt32",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListGroupClientsRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of groupClients by paging and conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "list of groupClients by query parameters",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListGroupClientsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupClient/list/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of groupClients by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "list of groupClients by batch id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListGroupClientsByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListGroupClientsByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/groupClient/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get groupClient detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "get groupClient detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetGroupClientByIDRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update groupClient information by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "update groupClient",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "groupClient information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateGroupClientByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateGroupClientByIDRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete groupClient by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groupClient"
+                ],
+                "summary": "delete groupClient",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteGroupClientByIDRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sms": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "submit information to create sms",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "create sms",
+                "parameters": [
+                    {
+                        "description": "sms information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateSmsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateSmsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sms/condition": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get sms by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "get sms by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetSmsByConditionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sms/delete/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete smss by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "delete smss",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteSmssByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteSmssByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sms/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of smss by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "list of smss by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "last id, default is MaxInt32",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListSmssRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of smss by paging and conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "list of smss by query parameters",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListSmssRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sms/list/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of smss by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "list of smss by batch id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListSmssByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListSmssByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sms/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get sms detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "get sms detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetSmsByIDRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update sms information by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "update sms",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "sms information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateSmsByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateSmsByIDRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete sms by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sms"
+                ],
+                "summary": "delete sms",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteSmsByIDRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/unanswerdCall": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "submit information to create unanswerdCall",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "create unanswerdCall",
+                "parameters": [
+                    {
+                        "description": "unanswerdCall information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateUnanswerdCallRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateUnanswerdCallRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/unanswerdCall/condition": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get unanswerdCall by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "get unanswerdCall by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetUnanswerdCallByConditionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/unanswerdCall/delete/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete unanswerdCalls by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "delete unanswerdCalls",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteUnanswerdCallsByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteUnanswerdCallsByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/unanswerdCall/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of unanswerdCalls by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "list of unanswerdCalls by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "last id, default is MaxInt32",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUnanswerdCallsRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of unanswerdCalls by paging and conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "list of unanswerdCalls by query parameters",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUnanswerdCallsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/unanswerdCall/list/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of unanswerdCalls by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "list of unanswerdCalls by batch id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUnanswerdCallsByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUnanswerdCallsByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/unanswerdCall/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get unanswerdCall detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "get unanswerdCall detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetUnanswerdCallByIDRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update unanswerdCall information by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "update unanswerdCall",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "unanswerdCall information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateUnanswerdCallByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateUnanswerdCallByIDRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete unanswerdCall by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "unanswerdCall"
+                ],
+                "summary": "delete unanswerdCall",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteUnanswerdCallByIDRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "submit information to create user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "create user",
+                "parameters": [
+                    {
+                        "description": "user information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateUserRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/condition": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get user by condition",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "get user by condition",
+                "parameters": [
+                    {
+                        "description": "query condition",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Conditions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetUserByConditionRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/delete/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete users by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "delete users",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteUsersByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteUsersByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of users by last id and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "list of users by last id and limit",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "last id, default is MaxInt32",
+                        "name": "lastID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "size in each page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "-id",
+                        "description": "sort by column name of table, and the ",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUsersRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of users by paging and conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "list of users by query parameters",
+                "parameters": [
+                    {
+                        "description": "query parameters",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Params"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUsersRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/list/ids": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "list of users by batch id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "list of users by batch id",
+                "parameters": [
+                    {
+                        "description": "id array",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUsersByIDsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.ListUsersByIDsRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get user detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "get user detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.GetUserByIDRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "update user information by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "update user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "user information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateUserByIDRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateUserByIDRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete user by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "delete user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.DeleteUserByIDRespond"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "types.CallHistoryObjDetail": {
+            "type": "object",
+            "properties": {
+                "clientMachineCode": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "convert to string id",
+                    "type": "string"
+                },
+                "instruction": {
+                    "type": "string"
+                },
+                "mobileNumber": {
+                    "type": "string"
+                },
+                "requestMachineCode": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ClientsObjDetail": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "convert to string id",
+                    "type": "string"
+                },
+                "ipAddress": {
+                    "type": "string"
+                },
+                "machineCode": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.Column": {
+            "type": "object",
+            "properties": {
+                "exp": {
+                    "description": "expressions, which default to = when the value is null, have =, !=, \u003e, \u003e=, \u003c, \u003c=, like",
+                    "type": "string"
+                },
+                "logic": {
+                    "description": "logical type, defaults to and when value is null, only \u0026(and), ||(or)",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "column name",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "column value"
+                }
+            }
+        },
+        "types.Conditions": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "description": "columns info",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.Column"
+                    }
+                }
+            }
+        },
+        "types.CreateCallHistoryRequest": {
+            "type": "object",
+            "properties": {
+                "clientMachineCode": {
+                    "type": "string"
+                },
+                "instruction": {
+                    "type": "string"
+                },
+                "mobileNumber": {
+                    "type": "string"
+                },
+                "requestMachineCode": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateCallHistoryRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateClientsRequest": {
+            "type": "object",
+            "properties": {
+                "ipAddress": {
+                    "type": "string"
+                },
+                "machineCode": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateClientsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateDistributionRequest": {
+            "type": "object",
+            "properties": {
+                "groupCallId": {
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.CreateDistributionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateGroupCallRequest": {
+            "type": "object",
+            "properties": {
+                "groupNumber": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "transferClientId": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateGroupCallRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateGroupClientRequest": {
+            "type": "object",
+            "properties": {
+                "clientId": {
+                    "type": "integer"
+                },
+                "groupId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.CreateGroupClientRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateSmsRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "body": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "machineCode": {
+                    "type": "string"
+                },
+                "smsType": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateSmsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateUnanswerdCallRequest": {
+            "type": "object",
+            "properties": {
+                "clientMachineCode": {
+                    "type": "string"
+                },
+                "mobileNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateUnanswerdCallRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateUserRequest": {
+            "type": "object",
+            "properties": {
+                "machineCode": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.CreateUserRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "description": "id",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteCallHistoryByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteCallHistorysByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.DeleteCallHistorysByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteClientsByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteClientssByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.DeleteClientssByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteDistributionByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteDistributionsByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.DeleteDistributionsByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteGroupCallByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteGroupCallsByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.DeleteGroupCallsByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteGroupClientByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteGroupClientsByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.DeleteGroupClientsByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteSmsByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteSmssByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.DeleteSmssByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteUnanswerdCallByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteUnanswerdCallsByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.DeleteUnanswerdCallsByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteUserByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteUsersByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.DeleteUsersByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.DistributionObjDetail": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "groupCallId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "convert to string id",
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.GetCallHistoryByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "callHistory": {
+                            "$ref": "#/definitions/types.CallHistoryObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetCallHistoryByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "callHistory": {
+                            "$ref": "#/definitions/types.CallHistoryObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetClientsByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "clients": {
+                            "$ref": "#/definitions/types.ClientsObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetClientsByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "clients": {
+                            "$ref": "#/definitions/types.ClientsObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetDistributionByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "distribution": {
+                            "$ref": "#/definitions/types.DistributionObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetDistributionByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "distribution": {
+                            "$ref": "#/definitions/types.DistributionObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetGroupCallByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "groupCall": {
+                            "$ref": "#/definitions/types.GroupCallObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetGroupCallByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "groupCall": {
+                            "$ref": "#/definitions/types.GroupCallObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetGroupClientByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "groupClient": {
+                            "$ref": "#/definitions/types.GroupClientObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetGroupClientByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "groupClient": {
+                            "$ref": "#/definitions/types.GroupClientObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetSmsByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "sms": {
+                            "$ref": "#/definitions/types.SmsObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetSmsByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "sms": {
+                            "$ref": "#/definitions/types.SmsObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetUnanswerdCallByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "unanswerdCall": {
+                            "$ref": "#/definitions/types.UnanswerdCallObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetUnanswerdCallByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "unanswerdCall": {
+                            "$ref": "#/definitions/types.UnanswerdCallObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetUserByConditionRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "user": {
+                            "$ref": "#/definitions/types.UserObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GetUserByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "user": {
+                            "$ref": "#/definitions/types.UserObjDetail"
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.GroupCallObjDetail": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "groupNumber": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "convert to string id",
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "transferClientId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.GroupClientObjDetail": {
+            "type": "object",
+            "properties": {
+                "clientId": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "groupId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "convert to string id",
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListCallHistorysByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.ListCallHistorysByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "callHistorys": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.CallHistoryObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListCallHistorysRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "callHistorys": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.CallHistoryObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListClientssByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.ListClientssByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "clientss": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.ClientsObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListClientssRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "clientss": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.ClientsObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListDistributionsByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.ListDistributionsByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "distributions": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.DistributionObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListDistributionsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "distributions": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.DistributionObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListGroupCallsByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.ListGroupCallsByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "groupCalls": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.GroupCallObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListGroupCallsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "groupCalls": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.GroupCallObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListGroupClientsByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.ListGroupClientsByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "groupClients": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.GroupClientObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListGroupClientsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "groupClients": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.GroupClientObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListSmssByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.ListSmssByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "smss": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.SmsObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListSmssRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "smss": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.SmsObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListUnanswerdCallsByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.ListUnanswerdCallsByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "unanswerdCalls": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.UnanswerdCallObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListUnanswerdCallsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "unanswerdCalls": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.UnanswerdCallObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListUsersByIDsRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "id list",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.ListUsersByIDsRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "users": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.UserObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListUsersRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data",
+                    "type": "object",
+                    "properties": {
+                        "users": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.UserObjDetail"
+                            }
+                        }
+                    }
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.Params": {
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "description": "query conditions",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.Column"
+                    }
+                },
+                "page": {
+                    "description": "page number, starting from page 0",
+                    "type": "integer"
+                },
+                "size": {
+                    "description": "lines per page",
+                    "type": "integer"
+                },
+                "sort": {
+                    "description": "sorted fields, multi-column sorting separated by commas",
+                    "type": "string"
+                }
+            }
+        },
+        "types.SmsObjDetail": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "body": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "convert to string id",
+                    "type": "string"
+                },
+                "machineCode": {
+                    "type": "string"
+                },
+                "smsType": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.UnanswerdCallObjDetail": {
+            "type": "object",
+            "properties": {
+                "clientMachineCode": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "convert to string id",
+                    "type": "string"
+                },
+                "mobileNumber": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateCallHistoryByIDRequest": {
+            "type": "object",
+            "properties": {
+                "clientMachineCode": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "uint64 id",
+                    "type": "integer"
+                },
+                "instruction": {
+                    "type": "string"
+                },
+                "mobileNumber": {
+                    "type": "string"
+                },
+                "requestMachineCode": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateCallHistoryByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateClientsByIDRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "uint64 id",
+                    "type": "integer"
+                },
+                "ipAddress": {
+                    "type": "string"
+                },
+                "machineCode": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateClientsByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateDistributionByIDRequest": {
+            "type": "object",
+            "properties": {
+                "groupCallId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "uint64 id",
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.UpdateDistributionByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateGroupCallByIDRequest": {
+            "type": "object",
+            "properties": {
+                "groupNumber": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "uint64 id",
+                    "type": "integer"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "transferClientId": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateGroupCallByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateGroupClientByIDRequest": {
+            "type": "object",
+            "properties": {
+                "clientId": {
+                    "type": "integer"
+                },
+                "groupId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "uint64 id",
+                    "type": "integer"
+                }
+            }
+        },
+        "types.UpdateGroupClientByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateSmsByIDRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "body": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "uint64 id",
+                    "type": "integer"
+                },
+                "machineCode": {
+                    "type": "string"
+                },
+                "smsType": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateSmsByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateUnanswerdCallByIDRequest": {
+            "type": "object",
+            "properties": {
+                "clientMachineCode": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "uint64 id",
+                    "type": "integer"
+                },
+                "mobileNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateUnanswerdCallByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateUserByIDRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "uint64 id",
+                    "type": "integer"
+                },
+                "machineCode": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.UpdateUserByIDRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "return data"
+                },
+                "msg": {
+                    "description": "return information description",
+                    "type": "string"
+                }
+            }
+        },
+        "types.UserObjDetail": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "convert to string id",
+                    "type": "string"
+                },
+                "machineCode": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type Bearer your-jwt-token to Value",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

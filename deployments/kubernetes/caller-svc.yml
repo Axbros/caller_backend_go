@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: caller-svc
+  namespace: yh-caller
+spec:
+  selector:
+    app: caller
+  type: ClusterIP
+  ports:
+    - name: caller-svc-http-port
+      port: 8080
+      targetPort: 8080
+

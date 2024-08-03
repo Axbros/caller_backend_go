@@ -20,6 +20,7 @@ func userRouter(group *gin.RouterGroup, h handler.UserHandler) {
 	group.DELETE("/user/:id", h.DeleteByID)
 	group.PUT("/user/:id", h.UpdateByID)
 	group.GET("/user/:id", h.GetByID)
+	group.GET("/user/getUserMachineCodeByClientMachineCode/:machine_code", h.GetUserMachineCodeByClientMachineCode)
 	group.POST("/user/list", h.List)
 
 	group.POST("/user/delete/ids", h.DeleteByIDs)

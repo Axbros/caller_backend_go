@@ -35,6 +35,7 @@ type UserDao interface {
 	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.User) (uint64, error)
 	DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.User) error
+	GetUserMachineCodeByClientMachineCode(ctx context.Context, clientMachineCode string) ([]*model.User, error)
 }
 
 type userDao struct {
@@ -380,4 +381,26 @@ func (d *userDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.User
 	_ = d.deleteCache(ctx, table.ID)
 
 	return err
+}
+func (d *userDao) GetUserMachineCodeByClientMachineCode(ctx context.Context, clientMachineCode string) ([]*model.User, error) {
+	// 执行复杂查询
+	userMachineCodes := []*model.User{}
+	subQuery1 := d.db.WithContext(ctx).Table("group_client").
+		Joins("JOIN clients ON group_client.client_id = clients.id").
+		Where("clients.machine_code =?", clientMachineCode).
+		Select("group_client.group_name")
+
+	subQuery2 := d.db.WithContext(ctx).Table("group_call").
+		Where("group_call.group_name = (?)", subQuery1).
+		Select("group_call.id")
+
+	subQuery3 := d.db.WithContext(ctx).Table("distribution").
+		Where("distribution.group_call_id IN (?)", subQuery2).
+		Select("distribution.user_id")
+
+	d.db.WithContext(ctx).Table("user").
+		Where("user.id IN (?)", subQuery3).
+		Select("user.*").
+		Find(&userMachineCodes)
+	return userMachineCodes, nil
 }

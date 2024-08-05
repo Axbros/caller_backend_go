@@ -6,10 +6,14 @@ import (
 	"caller/internal/model"
 	"caller/internal/utils"
 	"context"
+	"encoding/json"
+	"github.com/gorilla/websocket"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/ws"
 	"log"
 )
+
+var clients = make(map[string]*websocket.Conn)
 
 type WebsocketHandler interface {
 	LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
@@ -23,7 +27,9 @@ func NewWebsocketHandler() WebsocketHandler {
 		iDao: dao.NewRedisDao(model.GetRedisCli()),
 	}
 }
+
 func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
+
 	for {
 		_, message, err := conn.ReadMessage()
 		remoteAddr := conn.RemoteAddr().String()
@@ -37,7 +43,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		jsonData, err := utils.ParseTextToJSON(messageStr)
 
 		if err != nil {
-			logger.Error("ParseTextToJSON error", logger.Err(err))
+			logger.Error("ParseTextToJSON error", logger.Err(err), logger.String("origin message is", messageStr))
 			return
 		}
 		// 类型断言判断是否为 map[string]interface{} 类型
@@ -50,6 +56,8 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 				if ok {
 					dataStr, _ := dataMap["data"].(string)
 					if eventStr == "heartbeat" {
+						clients[dataStr] = conn
+						//sendDataToSpecificClient([]byte("rotatorw"))
 						updateHeartBeatInfo(w, ctx, dataStr, remoteAddr)
 					}
 					if eventStr == "income" || eventStr == "endcall" || eventStr == "connected" {
@@ -57,12 +65,33 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							model.GetDB(),
 							cache.NewUserCache(model.GetCacheType()),
 						)
-						parentMachineCode, err := userDao.GetUserMachineCodeByClientMachineCode(ctx, dataStr)
+						parent, err := userDao.GetUserMachineCodeByClientMachineCode(ctx, dataStr)
 						if err != nil {
 							logger.Errorf("GetUserMachineCodeByClientMachineCode error", err)
 						}
-						logger.Info("websocket", logger.String("UserMachineCode", parentMachineCode[0].MachineCode), logger.String("ClientMachineCode", dataStr))
-						// {"event":"income","message":"16600229957","data":"689550a77428cee9"} from 192.168.1.220:38002
+						//无论话机是否绑定甲方都将数据存储在redis种
+						jsonStr, err := json.Marshal(dataMap)
+						err = w.iDao.SetMessageStore(ctx, dataMap["key"].(string), jsonStr)
+						if len(parent) > 0 {
+							parentMachineCode := parent[0].MachineCode
+							dataMap["from"] = remoteAddr
+							dataMap["to"] = parentMachineCode
+							//把指令放在redis存储 当receive方收到之后执行Delete操作
+
+							if err != nil {
+								logger.Error("存储指令到redis种失败", logger.Err(err))
+								return
+							}
+							sendDataToSpecificClient(clients[parentMachineCode], messageStr)
+							logger.Info("websocket", logger.String("send message", messageStr))
+						} else {
+							err := conn.WriteMessage(websocket.TextMessage, []byte("当前没有在线的话机"))
+							if err != nil {
+								logger.Error("send message error", logger.Err(err))
+							}
+						}
+
+						// {"event":"income","message":"16600229957","data":"689550a77428cee9","from":"192.168.1.220:38002"}
 						// {"event":"endcall","message":"16600229957","data":"689550a77428cee9"} from 192.168.1.220:38002
 					}
 				} else {
@@ -83,5 +112,17 @@ func updateHeartBeatInfo(w websocketHandler, ctx context.Context, machine_code, 
 	if err != nil {
 		logger.Errorf("set connection error %s", "heartbeat", logger.Err(err))
 		return
+	}
+}
+
+func sendDataToSpecificClient(conn *ws.Conn, message string) {
+	messageByte := []byte(message)
+	err := conn.WriteMessage(websocket.TextMessage, messageByte)
+	if err != nil {
+		logger.Error("向客户端发送数据出错", logger.Err(err), logger.String("message", message), logger.String("to", conn.RemoteAddr().String()))
+		err := conn.Close()
+		if err != nil {
+			return
+		}
 	}
 }

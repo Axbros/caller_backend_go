@@ -7,8 +7,8 @@ import (
 type GroupClient struct {
 	ggorm.Model `gorm:"embedded"` // embed id and time
 
-	GroupID  int `gorm:"column:group_name;type:int(11);NOT NULL" json:"groupId"`
-	ClientID int `gorm:"column:client_id;type:int(11);NOT NULL" json:"clientId"`
+	GroupName string `gorm:"column:group_name;type:varchar(255);NOT NULL" json:"groupName"`
+	ClientID  int    `gorm:"column:client_id;type:int(11);NOT NULL" json:"clientId"`
 }
 
 // TableName table name

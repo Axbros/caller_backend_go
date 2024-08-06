@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"golang.org/x/sync/singleflight"
@@ -93,6 +94,7 @@ func (r *redisDao) DeleteMessageStore(ctx context.Context, key string) error {
 		logger.Errorf("删除 Store Message Hash 失败: %v", err)
 		return err
 	}
+	logger.Info("delete store", logger.String("key", key))
 	return nil
 }
 func (r *redisDao) SetKey(ctx context.Context, key string, value string) error {

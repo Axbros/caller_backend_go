@@ -97,8 +97,8 @@ func (d *groupClientDao) updateDataByID(ctx context.Context, db *gorm.DB, table 
 
 	update := map[string]interface{}{}
 
-	if table.GroupID != 0 {
-		update["group_name"] = table.GroupID
+	if table.GroupName != "" {
+		update["group_name"] = table.GroupName
 	}
 	if table.ClientID != 0 {
 		update["client_id"] = table.ClientID

@@ -25,7 +25,8 @@ import (
 )
 
 var (
-	apiV1RouterFns []func(r *gin.RouterGroup) // group router functions
+	apiV1RouterFns     []func(r *gin.RouterGroup) // group router functions
+	websocketRouterFns []func(r *gin.RouterGroup)
 	// if you have other group routes you can define them here
 	// example:
 	//     apiV2RouterFns []func(r *gin.RouterGroup)
@@ -103,6 +104,7 @@ func NewRouter() *gin.Engine {
 
 	// register routers, middleware support
 	registerRouters(r, "/api/v1", apiV1RouterFns)
+	registerRouters(r, "/ws", websocketRouterFns)
 	// if you have other group routes you can add them here
 	// example:
 	//    registerRouters(r, "/api/v2", apiV2RouteFns, middleware.Auth())

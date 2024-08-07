@@ -11,6 +11,7 @@ import (
 
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
 	"github.com/zhufuyi/sponge/pkg/ggorm/query"
+	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"caller/internal/cache"
@@ -35,6 +36,8 @@ type DistributionDao interface {
 	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.Distribution) (uint64, error)
 	DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.Distribution) error
+
+	GetDistributedGroupCallIdByUserId(ctx context.Context, userId string) (groupcallId uint64)
 }
 
 type distributionDao struct {
@@ -383,4 +386,13 @@ func (d *distributionDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *mo
 	_ = d.deleteCache(ctx, table.ID)
 
 	return err
+}
+func (d *distributionDao) GetDistributedGroupCallIdByUserId(ctx context.Context, userId string) (groupcallId uint64) {
+	var record *model.Distribution
+	err := d.db.WithContext(ctx).Where("distribution.user_id =?", userId).Find(&record).Error
+	if err != nil {
+		logger.Error("getDistributedGroupCallIdByUserId", logger.Err(err), logger.String("user id", userId))
+
+	}
+	return record.GroupCallID
 }

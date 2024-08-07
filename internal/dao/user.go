@@ -11,6 +11,7 @@ import (
 
 	cacheBase "github.com/zhufuyi/sponge/pkg/cache"
 	"github.com/zhufuyi/sponge/pkg/ggorm/query"
+	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/utils"
 
 	"caller/internal/cache"
@@ -35,7 +36,8 @@ type UserDao interface {
 	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.User) (uint64, error)
 	DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.User) error
-	GetUserMachineCodeByClientMachineCode(ctx context.Context, clientMachineCode string) ([]*model.User, error)
+	GetUserByClientMachineCode(ctx context.Context, clientMachineCode string) (*model.User, error)
+	GetUserIdByUserMachineCode(ctx context.Context, machine_code string) (*model.User, error)
 }
 
 type userDao struct {
@@ -382,12 +384,11 @@ func (d *userDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.User
 
 	return err
 }
-func (d *userDao) GetUserMachineCodeByClientMachineCode(ctx context.Context, clientMachineCode string) ([]*model.User, error) {
+func (d *userDao) GetUserByClientMachineCode(ctx context.Context, clientId string) (*model.User, error) {
 	// 执行复杂查询
-	userMachineCodes := []*model.User{}
+	record := &model.User{}
 	subQuery1 := d.db.WithContext(ctx).Table("group_client").
-		Joins("JOIN clients ON group_client.client_id = clients.id").
-		Where("clients.machine_code =?", clientMachineCode).
+		Where("group_client.client_id =?", clientId).
 		Select("group_client.group_name")
 
 	subQuery2 := d.db.WithContext(ctx).Table("group_call").
@@ -401,6 +402,15 @@ func (d *userDao) GetUserMachineCodeByClientMachineCode(ctx context.Context, cli
 	d.db.WithContext(ctx).Table("user").
 		Where("user.id IN (?)", subQuery3).
 		Select("user.*").
-		Find(&userMachineCodes)
-	return userMachineCodes, nil
+		Find(&record)
+	return record, nil
+}
+
+func (d *userDao) GetUserIdByUserMachineCode(ctx context.Context, machine_code string) (*model.User, error) {
+	var record *model.User
+	err := d.db.WithContext(ctx).Table("user").Where("user.machine_code = ?", machine_code).Select("user.*").Find(&record).Error
+	if err != nil {
+		logger.Error("getUserIdByUserMachineCode", logger.Err(err), logger.String("machine code", machine_code))
+	}
+	return record, err
 }

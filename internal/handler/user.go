@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"math"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -34,7 +33,8 @@ type UserHandler interface {
 	GetByCondition(c *gin.Context)
 	ListByIDs(c *gin.Context)
 	ListByLastID(c *gin.Context)
-	GetUserMachineCodeByClientMachineCode(c *gin.Context)
+	GetUserByClientMachineCode(c *gin.Context)
+	GetUserIdByUserMachineCode(c *gin.Context)
 }
 
 type userHandler struct {
@@ -205,17 +205,7 @@ func (h *userHandler) GetByID(c *gin.Context) {
 	response.Success(c, gin.H{"user": data})
 }
 
-// GetUserMachineCodeByClientMachineCode get a record by ClientMachineCode
-// @Summary get user machine code by client machine code
-// @Description get user detail by client_machine_code
-// @Tags user
-// @Param id path string true "client_machine_code"
-// @Accept json
-// @Produce json
-// @Success 200 {object} types.GetUserByIDRespond{}
-// @Router /api/v1/user/getUserMachineCodeByClientMachineCode/{client_machine_code} [get]
-// @Security BearerAuth
-func (h *userHandler) GetUserMachineCodeByClientMachineCode(c *gin.Context) {
+func (h *userHandler) GetUserByClientMachineCode(c *gin.Context) {
 	idStr, isAbort := getClientMachineCodeFromPath(c)
 	if isAbort {
 		response.Error(c, ecode.InvalidParams)
@@ -223,13 +213,13 @@ func (h *userHandler) GetUserMachineCodeByClientMachineCode(c *gin.Context) {
 	}
 
 	ctx := middleware.WrapCtx(c)
-	user, err := h.iDao.GetUserMachineCodeByClientMachineCode(ctx, idStr)
+	user, err := h.iDao.GetUserByClientMachineCode(ctx, idStr)
 	if err != nil {
 		if errors.Is(err, model.ErrRecordNotFound) {
-			logger.Warn("GetUserMachineCodeByClientMachineCode not found", logger.Err(err), logger.Any("id", idStr), middleware.GCtxRequestIDField(c))
+			logger.Warn("GetUserByClientMachineCode not found", logger.Err(err), logger.Any("id", idStr), middleware.GCtxRequestIDField(c))
 			response.Error(c, ecode.NotFound)
 		} else {
-			logger.Error("GetUserMachineCodeByClientMachineCode error", logger.Err(err), logger.Any("id", idStr), middleware.GCtxRequestIDField(c))
+			logger.Error("GetUserByClientMachineCode error", logger.Err(err), logger.Any("id", idStr), middleware.GCtxRequestIDField(c))
 			response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		}
 		return
@@ -243,9 +233,6 @@ func (h *userHandler) GetUserMachineCodeByClientMachineCode(c *gin.Context) {
 	}
 	// Note: if copier.Copy cannot assign a value to a field, add it here
 	data.MachineCode = idStr
-	data.ID = strconv.FormatUint(user[0].Model.ID, 10)
-	data.CreatedAt = user[0].Model.CreatedAt
-	data.UpdatedAt = user[0].Model.UpdatedAt
 	response.Success(c, gin.H{"user": data})
 }
 
@@ -454,6 +441,25 @@ func (h *userHandler) ListByLastID(c *gin.Context) {
 	})
 }
 
+func (h *userHandler) GetUserIdByUserMachineCode(c *gin.Context) {
+	machine_code_string, isAbort := getClientMachineCodeFromPath(c)
+
+	if isAbort {
+		response.Error(c, ecode.InvalidParams)
+		return
+	}
+
+	user, err := h.iDao.GetUserIdByUserMachineCode(c, machine_code_string)
+	if err != nil {
+		logger.Error("GetUserIdByUserMachineCode", logger.Err(err), logger.Any("machine code", machine_code_string), middleware.GCtxRequestIDField(c))
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		return
+	}
+	response.Success(c, gin.H{
+		"user": user,
+	})
+}
+
 func getUserIDFromPath(c *gin.Context) (string, uint64, bool) {
 	idStr := c.Param("id")
 	id, err := utils.StrToUint64E(idStr)
@@ -466,14 +472,14 @@ func getUserIDFromPath(c *gin.Context) (string, uint64, bool) {
 }
 
 func getClientMachineCodeFromPath(c *gin.Context) (string, bool) {
-	idStr := c.Param("machine_code")
+	MachineCode := c.Param("machine_code")
 
-	if idStr == "" {
-		logger.Warn("StrToUint64E error: ", logger.String("idStr", idStr), middleware.GCtxRequestIDField(c))
+	if MachineCode == "" {
+		logger.Warn("StrToUint64E error: ", logger.String("MachineCode", MachineCode), middleware.GCtxRequestIDField(c))
 		return "", true
 	}
 
-	return idStr, false
+	return MachineCode, false
 }
 func convertUser(user *model.User) (*types.UserObjDetail, error) {
 	data := &types.UserObjDetail{}

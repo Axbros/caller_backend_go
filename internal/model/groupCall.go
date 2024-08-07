@@ -7,7 +7,7 @@ import (
 type GroupCall struct {
 	ggorm.Model `gorm:"embedded"` // embed id and time
 
-	GroupNumber      string `gorm:"column:group_client_id;type:varchar(4)" json:"groupNumber"`
+	GroupName        string `gorm:"column:group_name;type:varchar(4)" json:"groupNumber"`
 	PhoneNumber      string `gorm:"column:phone_number;type:varchar(11)" json:"phoneNumber"`
 	TransferClientID string `gorm:"column:transfer_client_id;type:varchar(32)" json:"transferClientId"`
 }

@@ -16,7 +16,6 @@
 vendor/
 dist/
 env/
-test/
 # idea
 .idea
 *.iml

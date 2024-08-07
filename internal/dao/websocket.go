@@ -23,6 +23,7 @@ type RedisDao interface {
 	SetKey(ctx context.Context, key string, value string) error
 	GetKey(ctx context.Context, key string) (string, error)
 	DeleteKey(ctx context.Context, key string) error
+	GetQueenValue(ctx context.Context, key string) (string, error)
 }
 
 type redisDao struct {
@@ -121,4 +122,19 @@ func (r *redisDao) DeleteKey(ctx context.Context, key string) error {
 		return fmt.Errorf("failed to delete key from Redis: %v", err)
 	}
 	return nil
+}
+func (r *redisDao) GetQueenValue(ctx context.Context, key string) (string, error) {
+	// 读取列表的首个元素
+	value, err := r.client.LPop(ctx, key).Result()
+	if err != nil {
+		fmt.Println("读取列表元素时出错:", err)
+		return "", err
+	}
+	// 将读取的元素添加到列表尾部
+	err = r.client.RPush(ctx, key, value).Err()
+	if err != nil {
+		fmt.Println("将元素添加到列表尾部时出错:", err)
+		return "", err
+	}
+	return value, nil
 }

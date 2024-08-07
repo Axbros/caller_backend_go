@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/ws"
 )
@@ -104,11 +105,45 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 								}
 							}
 						}
+						if eventStr == "transfer_done" {
+							client_id := dataMap["data"].(string)
+							messageKey := dataMap["key"].(string)
+							//此时中专机应在data将自己的id传过来 然后用这个id去group_call表查询transfer_client_id 为 {id}的记录
+							groupcall_record, err := w.gDao.GetByCondition(ctx, &query.Conditions{
+								Columns: []query.Column{
+									{
+										Name:  "transfer_client_id",
+										Value: client_id,
+									},
+								},
+							})
+							if err != nil {
+								logger.Err(err)
+							}
+							//查询到上方的记录就有了group_call.id 拿到这个id去distribution表查询group_call_id=group_call.id的记录
+							distribution_record, _ := w.dDao.GetByCondition(ctx, &query.Conditions{
+								Columns: []query.Column{
+									{
+										Name:  "group_call_id",
+										Value: groupcall_record.ID,
+									},
+								}})
+
+							//上方查询成功后会拿到user_id 把配置成功的消息发给user
+
+							sendDataToSpecificClient(clients[strconv.Itoa(distribution_record.UserID)], generateServerWebsocketMsg("中转机已成功配置，即将拨打电话", messageKey))
+							//开始给话机拨打电话
+							queen_client, _ := w.iDao.GetQueenValue(ctx, "group_name_"+groupcall_record.GroupName)
+							sendDataToSpecificClient(clients[strconv.Itoa(distribution_record.UserID)], generateServerWebsocketMsg("已从队列取出话机："+queen_client, messageKey))
+							//给话机传递指令 拨打中转号码
+							sendDataToSpecificClient(clients[queen_client], generateStandardWebsocketMsg("call", groupcall_record.PhoneNumber, messageKey))
+						}
 					}
 
 					if userTypeStr == "user" {
 						//处理用户端的消息
 						data := dataMap["data"].(string)
+						messageStr := dataMap["message"].(string)
 						messageKey := dataMap["key"].(string)
 						redisStoreKey := data + ":" + messageKey // 88888888:testkey
 						if eventStr == "receive" {               //表示用户端收到话机的指令 需要执行清除redis操作
@@ -135,8 +170,14 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 								transfer_machine_id := group_call_record.TransferClientID
 								sendDataToSpecificClient(conn, generateServerWebsocketMsg(fmt.Sprintf("中转号码：%s 中转设备:%s", transfer_phone, transfer_machine_id), messageKey))
 								if clients[transfer_machine_id] != nil {
-									sendDataToSpecificClient(clients[transfer_machine_id], generateStandardWebsocketMsg("transfer", transfer_phone, messageKey))
+									err := sendDataToSpecificClient(clients[transfer_machine_id], generateStandardWebsocketMsg("transfer", messageStr, messageKey))
+									if err != nil {
+										sendDataToSpecificClient(conn, generateServerWebsocketMsg("中转配置出错，中转设备ID："+transfer_machine_id, messageKey))
+									}
 								} else {
+									// for key, value := range clients {
+									// 	fmt.Printf("Key: %s, Value: %s\n", key, value.RemoteAddr)
+									// }
 									sendDataToSpecificClient(conn, generateServerWebsocketMsg("中转设备不在线！请联系管理员处理，中转设备ID："+transfer_machine_id, messageKey))
 								}
 
@@ -168,20 +209,22 @@ func updateHeartBeatInfo(w websocketHandler, ctx context.Context, machine_code, 
 	}
 }
 
-func sendDataToSpecificClient(conn *ws.Conn, message []byte) {
+func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
+	logger.Info("websocket", logger.String("send to", conn.RemoteAddr().String()), logger.String("message", string(message)))
 	if conn != nil {
 		err := conn.WriteMessage(websocket.TextMessage, message)
 		if err != nil {
 			logger.Error("向客户端发送数据出错", logger.Err(err), logger.String("message", string(message)), logger.String("to", conn.RemoteAddr().String()))
 			err := conn.Close()
 			if err != nil {
-				return
+				return err
 			}
 		}
 	} else {
 		logger.Error("接收设备不在线:" + conn.RemoteAddr().String())
 	}
 	time.Sleep(1 * time.Second)
+	return nil
 }
 
 func generateServerWebsocketMsg(message, key string) []byte {
@@ -190,6 +233,6 @@ func generateServerWebsocketMsg(message, key string) []byte {
 }
 
 func generateStandardWebsocketMsg(event, message, key string) []byte {
-	msg := fmt.Sprintf(`{"event":"receive","message":"%s","data":"","key":"%s","type":"server"}`, message, key)
+	msg := fmt.Sprintf(`{"event":"%s","message":"%s","data":"","key":"%s","type":"server"}`, event, message, key)
 	return []byte(msg)
 }

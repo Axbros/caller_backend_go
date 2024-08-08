@@ -77,7 +77,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 					}
 
 					if userTypeStr == "client" { //处理客户端的消息
-						if eventStr == "income" || eventStr == "endcall" || eventStr == "connected" {
+						if eventStr == "income" || eventStr == "endcall" || eventStr == "connected" || eventStr == "call_done" {
 							parent, err := w.uDao.GetUserByClientMachineCode(ctx, dataStr)
 							if err != nil {
 								logger.Error("GetUserByClientMachineCode error", logger.Err(err))
@@ -105,6 +105,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 								}
 							}
 						}
+
 						if eventStr == "transfer_done" {
 							client_id := dataMap["data"].(string)
 							messageKey := dataMap["key"].(string)
@@ -134,7 +135,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							sendDataToSpecificClient(clients[strconv.Itoa(distribution_record.UserID)], generateServerWebsocketMsg("中转机已成功配置，即将拨打电话", messageKey))
 							//开始给话机拨打电话
 							queen_client, _ := w.iDao.GetQueenValue(ctx, "group_name_"+groupcall_record.GroupName)
-							sendDataToSpecificClient(clients[strconv.Itoa(distribution_record.UserID)], generateServerWebsocketMsg("已从队列取出话机："+queen_client, messageKey))
+							sendDataToSpecificClient(clients[strconv.Itoa(distribution_record.UserID)], generateServerWebsocketMsg("您的话机组名为：【"+groupcall_record.GroupName+"】已从队列取出话机："+queen_client+"即将呼出目标号码", messageKey))
 							//给话机传递指令 拨打中转号码
 							sendDataToSpecificClient(clients[queen_client], generateStandardWebsocketMsg("call", groupcall_record.PhoneNumber, messageKey))
 						}
@@ -142,6 +143,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 
 					if userTypeStr == "user" {
 						//处理用户端的消息
+						logger.Info("receive from user", logger.String("message", messageStr))
 						data := dataMap["data"].(string)
 						messageStr := dataMap["message"].(string)
 						messageKey := dataMap["key"].(string)
@@ -149,10 +151,19 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 						if eventStr == "receive" {               //表示用户端收到话机的指令 需要执行清除redis操作
 							w.iDao.DeleteMessageStore(ctx, redisStoreKey)
 						}
-						if eventStr == "endcall" || eventStr == "answer" {
+						if eventStr == "endcall" {
 							w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
-							sendDataToSpecificClient(clients[data], jsonStr)
+							//user excute endcall or answer should put the client machine code id to message,data is user machine code id
+							sendDataToSpecificClient(clients[messageStr], jsonStr)
 							//这里的data其实就是client machine code
+							//话机执行了挂断操作 需要 把结果告诉甲方
+							sendDataToSpecificClient(conn, generateServerWebsocketMsg("decline", messageKey))
+						}
+						if eventStr == "answer" {
+							// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
+							// //user excute endcall or answer should put the client machine code id to message,data is user machine code id
+							sendDataToSpecificClient(clients[messageStr], jsonStr)
+							return
 						}
 						if eventStr == "call" {
 							//这里面的data就是本机userID
@@ -184,7 +195,6 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							} else {
 								sendDataToSpecificClient(conn, generateServerWebsocketMsg("当前没有分配中转设备，即将选择直射模式", messageKey))
 							}
-
 						}
 					}
 

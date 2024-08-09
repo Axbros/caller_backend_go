@@ -29,13 +29,14 @@ type UnanswerdCallDao interface {
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.UnanswerdCall, int64, error)
 
 	DeleteByIDs(ctx context.Context, ids []uint64) error
-	GetByCondition(ctx context.Context, condition *query.Conditions) (*model.UnanswerdCall, error)
+	GetByCondition(ctx context.Context, condition *query.Conditions) ([]*model.UnanswerdCall, error)
 	GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UnanswerdCall, error)
 	GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.UnanswerdCall, error)
 
 	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.UnanswerdCall) (uint64, error)
 	DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UnanswerdCall) error
+	GetChildrenByUserID(ctx context.Context, UserID string) ([]model.GroupClient, error)
 }
 
 type unanswerdCallDao struct {
@@ -280,14 +281,14 @@ func (d *unanswerdCallDao) DeleteByIDs(ctx context.Context, ids []uint64) error 
 //			Value: "male",
 //		},
 //	}
-func (d *unanswerdCallDao) GetByCondition(ctx context.Context, c *query.Conditions) (*model.UnanswerdCall, error) {
+func (d *unanswerdCallDao) GetByCondition(ctx context.Context, c *query.Conditions) ([]*model.UnanswerdCall, error) {
 	queryStr, args, err := c.ConvertToGorm()
 	if err != nil {
 		return nil, err
 	}
 
-	table := &model.UnanswerdCall{}
-	err = d.db.WithContext(ctx).Where(queryStr, args...).First(table).Error
+	table := []*model.UnanswerdCall{}
+	err = d.db.WithContext(ctx).Where(queryStr, args...).Find(&table).Error
 	if err != nil {
 		return nil, err
 	}
@@ -406,4 +407,25 @@ func (d *unanswerdCallDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *m
 	_ = d.deleteCache(ctx, table.ID)
 
 	return err
+}
+func (d *unanswerdCallDao) GetChildrenByUserID(ctx context.Context, UserID string) ([]model.GroupClient, error) {
+	var distributionRecord model.Distribution
+	err := d.db.WithContext(ctx).Model(&model.Distribution{}).Where("user_id =?", UserID).First(&distributionRecord).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var groupCallRecord model.GroupCall
+	err = d.db.WithContext(ctx).Model(&model.GroupCall{}).Where("id =?", distributionRecord.ID).First(&groupCallRecord).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var groupClientRecord []model.GroupClient
+	err = d.db.WithContext(ctx).Model(&model.GroupClient{}).Where("group_name =?", groupCallRecord.GroupName).Find(&groupClientRecord).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return groupClientRecord, nil
 }

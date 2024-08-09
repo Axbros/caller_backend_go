@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -143,13 +144,22 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 
 					if userTypeStr == "user" {
 						//处理用户端的消息
-						logger.Info("receive from user", logger.String("message", messageStr))
+						logger.Info("receive from user", logger.String("message", messageStr), logger.String("event", eventStr))
 						data := dataMap["data"].(string)
 						messageStr := dataMap["message"].(string)
 						messageKey := dataMap["key"].(string)
 						redisStoreKey := data + ":" + messageKey // 88888888:testkey
 						if eventStr == "receive" {               //表示用户端收到话机的指令 需要执行清除redis操作
 							w.iDao.DeleteMessageStore(ctx, redisStoreKey)
+						}
+						if eventStr == "missed" {
+							children := strings.Split(messageStr, ",")
+
+							for _, child := range children {
+								if clients[child] != nil {
+									sendDataToSpecificClient(clients[child], jsonStr)
+								}
+							}
 						}
 						if eventStr == "endcall" {
 							w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)

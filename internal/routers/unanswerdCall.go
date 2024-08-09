@@ -27,4 +27,5 @@ func unanswerdCallRouter(group *gin.RouterGroup, h handler.UnanswerdCallHandler)
 	group.POST("/unanswerdCall/condition", h.GetByCondition)
 	group.POST("/unanswerdCall/list/ids", h.ListByIDs)
 	group.GET("/unanswerdCall/list", h.ListByLastID)
+	group.GET("/unanswerdCall/byUserId/:id", h.GetByUserID)
 }

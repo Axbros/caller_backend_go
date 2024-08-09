@@ -2,11 +2,13 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"math"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 
+	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gin/middleware"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
@@ -34,10 +36,12 @@ type UnanswerdCallHandler interface {
 	GetByCondition(c *gin.Context)
 	ListByIDs(c *gin.Context)
 	ListByLastID(c *gin.Context)
+	GetByUserID(c *gin.Context)
 }
 
 type unanswerdCallHandler struct {
 	iDao dao.UnanswerdCallDao
+	dDao dao.DistributionDao
 }
 
 // NewUnanswerdCallHandler creating the handler interface
@@ -46,6 +50,10 @@ func NewUnanswerdCallHandler() UnanswerdCallHandler {
 		iDao: dao.NewUnanswerdCallDao(
 			model.GetDB(),
 			cache.NewUnanswerdCallCache(model.GetCacheType()),
+		),
+		dDao: dao.NewDistributionDao(
+			model.GetDB(),
+			cache.NewDistributionCache(model.GetCacheType()),
 		),
 	}
 }
@@ -311,14 +319,14 @@ func (h *unanswerdCallHandler) GetByCondition(c *gin.Context) {
 		return
 	}
 
-	data := &types.UnanswerdCallObjDetail{}
+	data := &[]types.UnanswerdCallObjDetail{}
 	err = copier.Copy(data, unanswerdCall)
 	if err != nil {
 		response.Error(c, ecode.ErrGetByIDUnanswerdCall)
 		return
 	}
 	// Note: if copier.Copy cannot assign a value to a field, add it here
-	data.ID = utils.Uint64ToStr(unanswerdCall.ID)
+	// data.ID = utils.Uint64ToStr(unanswerdCall)
 
 	response.Success(c, gin.H{"unanswerdCall": data})
 }
@@ -406,6 +414,31 @@ func (h *unanswerdCallHandler) ListByLastID(c *gin.Context) {
 
 	response.Success(c, gin.H{
 		"unanswerdCalls": data,
+	})
+}
+func (h *unanswerdCallHandler) GetByUserID(c *gin.Context) {
+	userID, _, _ := getUnanswerdCallIDFromPath(c)
+	children, _ := h.iDao.GetChildrenByUserID(c, userID)
+	res := []*model.UnanswerdCall{}
+	var childrenList []int
+	for i := 0; i < len(children); i++ {
+		childrenList = append(childrenList, children[i].ClientID)
+		records, _ := h.iDao.GetByCondition(c, &query.Conditions{
+			Columns: []query.Column{
+				{
+					Name:  "client_id",
+					Value: children[i].ClientID,
+				},
+			},
+		})
+		for _, record := range records {
+			res = append(res, record)
+			fmt.Println(res)
+		}
+	}
+	response.Success(c, gin.H{
+		"children": childrenList,
+		"data":     res,
 	})
 }
 

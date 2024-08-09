@@ -24,6 +24,7 @@ var _ UnanswerdCallHandler = (*unanswerdCallHandler)(nil)
 // UnanswerdCallHandler defining the handler interface
 type UnanswerdCallHandler interface {
 	Create(c *gin.Context)
+	MultipleCreate(c *gin.Context)
 	DeleteByID(c *gin.Context)
 	UpdateByID(c *gin.Context)
 	GetByID(c *gin.Context)
@@ -405,6 +406,16 @@ func (h *unanswerdCallHandler) ListByLastID(c *gin.Context) {
 
 	response.Success(c, gin.H{
 		"unanswerdCalls": data,
+	})
+}
+
+func (h *unanswerdCallHandler) MultipleCreate(c *gin.Context) {
+	var machineId string
+	machineId = c.Request.Header.Get("machine_id")
+	body, _ := c.GetRawData()
+	response.Success(c, gin.H{
+		"machine_id": machineId,
+		"body":       string(body),
 	})
 }
 

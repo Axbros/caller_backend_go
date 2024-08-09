@@ -17,6 +17,7 @@ func unanswerdCallRouter(group *gin.RouterGroup, h handler.UnanswerdCallHandler)
 	// or group.Use(middleware.Auth(middleware.WithVerify(verify))) // token authentication
 
 	group.POST("/unanswerdCall", h.Create)
+	group.POST("/unanswerdCall/fromDevice", h.MultipleCreate)
 	group.DELETE("/unanswerdCall/:id", h.DeleteByID)
 	group.PUT("/unanswerdCall/:id", h.UpdateByID)
 	group.GET("/unanswerdCall/:id", h.GetByID)

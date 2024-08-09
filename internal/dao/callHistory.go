@@ -101,7 +101,7 @@ func (d *callHistoryDao) updateDataByID(ctx context.Context, db *gorm.DB, table 
 		update["request_machine_code"] = table.RequestMachineCode
 	}
 	if table.ClientMachineCode != "" {
-		update["client_machine_code"] = table.ClientMachineCode
+		update["client_id"] = table.ClientMachineCode
 	}
 	if table.MobileNumber != "" {
 		update["mobile_number"] = table.MobileNumber

@@ -22,6 +22,7 @@ var _ UnanswerdCallDao = (*unanswerdCallDao)(nil)
 // UnanswerdCallDao defining the dao interface
 type UnanswerdCallDao interface {
 	Create(ctx context.Context, table *model.UnanswerdCall) error
+	CreateMultiple(ctx context.Context, table *[]model.UnanswerdCall) error
 	DeleteByID(ctx context.Context, id uint64) error
 	UpdateByID(ctx context.Context, table *model.UnanswerdCall) error
 	GetByID(ctx context.Context, id uint64) (*model.UnanswerdCall, error)
@@ -66,6 +67,28 @@ func (d *unanswerdCallDao) deleteCache(ctx context.Context, id uint64) error {
 func (d *unanswerdCallDao) Create(ctx context.Context, table *model.UnanswerdCall) error {
 	return d.db.WithContext(ctx).Create(table).Error
 }
+func (d *unanswerdCallDao) CreateMultiple(ctx context.Context, table *[]model.UnanswerdCall) error {
+	for _, call := range *table {
+		var existingCall model.UnanswerdCall
+		result := d.db.Where("mobile_number =? AND client_time =?", call.MobileNumber, call.ClientTime).First(&existingCall)
+		if result.Error == nil {
+			// 如果找到相同的记录，跳过当前数据的添加
+			// fmt.Printf("已存在相同的 mobile_number: %s 和 client_time: %s 的记录，跳过添加\n", call.MobileNumber, call.ClientTime)
+			continue
+		} else if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			// 如果未找到相同记录，执行添加操作
+			if err := d.db.Create(&call).Error; err != nil {
+				return err
+			}
+		} else {
+			// 其他错误情况
+			return result.Error
+		}
+	}
+
+	return nil
+
+}
 
 // DeleteByID delete a record by id
 func (d *unanswerdCallDao) DeleteByID(ctx context.Context, id uint64) error {
@@ -98,7 +121,7 @@ func (d *unanswerdCallDao) updateDataByID(ctx context.Context, db *gorm.DB, tabl
 	update := map[string]interface{}{}
 
 	if table.ClientMachineCode != "" {
-		update["client_machine_code"] = table.ClientMachineCode
+		update["client_id"] = table.ClientMachineCode
 	}
 	if table.MobileNumber != "" {
 		update["mobile_number"] = table.MobileNumber

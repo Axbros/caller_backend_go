@@ -233,7 +233,7 @@ func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
 	} else {
 		logger.Error("接收设备不在线:" + conn.RemoteAddr().String())
 	}
-	time.Sleep(1 * time.Second)
+	time.Sleep(500 * time.Millisecond)
 	return nil
 }
 

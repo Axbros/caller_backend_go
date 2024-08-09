@@ -412,10 +412,23 @@ func (h *unanswerdCallHandler) ListByLastID(c *gin.Context) {
 func (h *unanswerdCallHandler) MultipleCreate(c *gin.Context) {
 	var machineId string
 	machineId = c.Request.Header.Get("machine_id")
-	body, _ := c.GetRawData()
+	// body := c.Request.Body
+	json := make(map[string]string) //注意该结构接受的内容
+	c.BindJSON(&json)
+	// fmt.Printf("%v", &json)
+	unansweredList := []model.UnanswerdCall{}
+	for key, value := range json {
+		record := model.UnanswerdCall{
+			ClientMachineCode: machineId,
+			ClientTime:        key,
+			MobileNumber:      value,
+		}
+		unansweredList = append(unansweredList, record)
+	}
+	h.iDao.CreateMultiple(c, &unansweredList)
+
 	response.Success(c, gin.H{
-		"machine_id": machineId,
-		"body":       string(body),
+		"status": "ok",
 	})
 }
 

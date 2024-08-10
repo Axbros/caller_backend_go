@@ -152,7 +152,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 						if eventStr == "receive" {               //表示用户端收到话机的指令 需要执行清除redis操作
 							w.iDao.DeleteMessageStore(ctx, redisStoreKey)
 						}
-						if eventStr == "missed" {
+						if eventStr == "missed" || eventStr == "outgoing" {
 							children := strings.Split(messageStr, ",")
 
 							for _, child := range children {

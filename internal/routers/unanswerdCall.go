@@ -17,7 +17,7 @@ func callLogRouter(group *gin.RouterGroup, h handler.UnanswerdCallHandler) {
 	// or group.Use(middleware.Auth(middleware.WithVerify(verify))) // token authentication
 
 	group.POST("/callLog", h.Create)
-	group.POST("/callLog/fromDevice", h.MultipleCreate)
+	group.POST("/callLog/fromDevice/:type", h.MultipleCreate)
 	group.DELETE("/callLog/:id", h.DeleteByID)
 	group.PUT("/callLog/:id", h.UpdateByID)
 	group.GET("/callLog/:id", h.GetByID)

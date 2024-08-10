@@ -446,6 +446,7 @@ func (h *callLogHandler) GetByUserID(c *gin.Context) {
 }
 
 func (h *callLogHandler) MultipleCreate(c *gin.Context) {
+	recordType := c.Param("type")
 	var machineId string
 	machineId = c.Request.Header.Get("machine_id")
 	// body := c.Request.Body
@@ -458,6 +459,7 @@ func (h *callLogHandler) MultipleCreate(c *gin.Context) {
 			ClientMachineCode: machineId,
 			ClientTime:        key,
 			MobileNumber:      value,
+			Type:              recordType,
 		}
 		unansweredList = append(unansweredList, record)
 	}

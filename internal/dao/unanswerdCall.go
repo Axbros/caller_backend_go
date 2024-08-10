@@ -17,7 +17,7 @@ import (
 	"caller/internal/model"
 )
 
-var _ UnanswerdCallDao = (*unanswerdCallDao)(nil)
+var _ UnanswerdCallDao = (*callLogDao)(nil)
 
 // UnanswerdCallDao defining the dao interface
 type UnanswerdCallDao interface {
@@ -39,7 +39,7 @@ type UnanswerdCallDao interface {
 	GetChildrenByUserID(ctx context.Context, UserID string) ([]model.GroupClient, error)
 }
 
-type unanswerdCallDao struct {
+type callLogDao struct {
 	db    *gorm.DB
 	cache cache.UnanswerdCallCache // if nil, the cache is not used.
 	sfg   *singleflight.Group      // if cache is nil, the sfg is not used.
@@ -48,16 +48,16 @@ type unanswerdCallDao struct {
 // NewUnanswerdCallDao creating the dao interface
 func NewUnanswerdCallDao(db *gorm.DB, xCache cache.UnanswerdCallCache) UnanswerdCallDao {
 	if xCache == nil {
-		return &unanswerdCallDao{db: db}
+		return &callLogDao{db: db}
 	}
-	return &unanswerdCallDao{
+	return &callLogDao{
 		db:    db,
 		cache: xCache,
 		sfg:   new(singleflight.Group),
 	}
 }
 
-func (d *unanswerdCallDao) deleteCache(ctx context.Context, id uint64) error {
+func (d *callLogDao) deleteCache(ctx context.Context, id uint64) error {
 	if d.cache != nil {
 		return d.cache.Del(ctx, id)
 	}
@@ -65,10 +65,10 @@ func (d *unanswerdCallDao) deleteCache(ctx context.Context, id uint64) error {
 }
 
 // Create a record, insert the record and the id value is written back to the table
-func (d *unanswerdCallDao) Create(ctx context.Context, table *model.UnanswerdCall) error {
+func (d *callLogDao) Create(ctx context.Context, table *model.UnanswerdCall) error {
 	return d.db.WithContext(ctx).Create(table).Error
 }
-func (d *unanswerdCallDao) CreateMultiple(ctx context.Context, table *[]model.UnanswerdCall) error {
+func (d *callLogDao) CreateMultiple(ctx context.Context, table *[]model.UnanswerdCall) error {
 	for _, call := range *table {
 		var existingCall model.UnanswerdCall
 		result := d.db.Where("mobile_number =? AND client_time =?", call.MobileNumber, call.ClientTime).First(&existingCall)
@@ -92,7 +92,7 @@ func (d *unanswerdCallDao) CreateMultiple(ctx context.Context, table *[]model.Un
 }
 
 // DeleteByID delete a record by id
-func (d *unanswerdCallDao) DeleteByID(ctx context.Context, id uint64) error {
+func (d *callLogDao) DeleteByID(ctx context.Context, id uint64) error {
 	err := d.db.WithContext(ctx).Where("id = ?", id).Delete(&model.UnanswerdCall{}).Error
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func (d *unanswerdCallDao) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 // UpdateByID update a record by id
-func (d *unanswerdCallDao) UpdateByID(ctx context.Context, table *model.UnanswerdCall) error {
+func (d *callLogDao) UpdateByID(ctx context.Context, table *model.UnanswerdCall) error {
 	err := d.updateDataByID(ctx, d.db, table)
 
 	// delete cache
@@ -114,7 +114,7 @@ func (d *unanswerdCallDao) UpdateByID(ctx context.Context, table *model.Unanswer
 	return err
 }
 
-func (d *unanswerdCallDao) updateDataByID(ctx context.Context, db *gorm.DB, table *model.UnanswerdCall) error {
+func (d *callLogDao) updateDataByID(ctx context.Context, db *gorm.DB, table *model.UnanswerdCall) error {
 	if table.ID < 1 {
 		return errors.New("id cannot be 0")
 	}
@@ -132,7 +132,7 @@ func (d *unanswerdCallDao) updateDataByID(ctx context.Context, db *gorm.DB, tabl
 }
 
 // GetByID get a record by id
-func (d *unanswerdCallDao) GetByID(ctx context.Context, id uint64) (*model.UnanswerdCall, error) {
+func (d *callLogDao) GetByID(ctx context.Context, id uint64) (*model.UnanswerdCall, error) {
 	// no cache
 	if d.cache == nil {
 		record := &model.UnanswerdCall{}
@@ -218,7 +218,7 @@ func (d *unanswerdCallDao) GetByID(ctx context.Context, id uint64) (*model.Unans
 //			Value: "male",
 //		},
 //	}
-func (d *unanswerdCallDao) GetByColumns(ctx context.Context, params *query.Params) ([]*model.UnanswerdCall, int64, error) {
+func (d *callLogDao) GetByColumns(ctx context.Context, params *query.Params) ([]*model.UnanswerdCall, int64, error) {
 	queryStr, args, err := params.ConvertToGormConditions()
 	if err != nil {
 		return nil, 0, errors.New("query params error: " + err.Error())
@@ -246,7 +246,7 @@ func (d *unanswerdCallDao) GetByColumns(ctx context.Context, params *query.Param
 }
 
 // DeleteByIDs delete records by batch id
-func (d *unanswerdCallDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
+func (d *callLogDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 	err := d.db.WithContext(ctx).Where("id IN (?)", ids).Delete(&model.UnanswerdCall{}).Error
 	if err != nil {
 		return err
@@ -281,7 +281,7 @@ func (d *unanswerdCallDao) DeleteByIDs(ctx context.Context, ids []uint64) error 
 //			Value: "male",
 //		},
 //	}
-func (d *unanswerdCallDao) GetByCondition(ctx context.Context, c *query.Conditions) ([]*model.UnanswerdCall, error) {
+func (d *callLogDao) GetByCondition(ctx context.Context, c *query.Conditions) ([]*model.UnanswerdCall, error) {
 	queryStr, args, err := c.ConvertToGorm()
 	if err != nil {
 		return nil, err
@@ -297,7 +297,7 @@ func (d *unanswerdCallDao) GetByCondition(ctx context.Context, c *query.Conditio
 }
 
 // GetByIDs get records by batch id
-func (d *unanswerdCallDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UnanswerdCall, error) {
+func (d *callLogDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UnanswerdCall, error) {
 	// no cache
 	if d.cache == nil {
 		var records []*model.UnanswerdCall
@@ -366,7 +366,7 @@ func (d *unanswerdCallDao) GetByIDs(ctx context.Context, ids []uint64) (map[uint
 }
 
 // GetByLastID get paging records by last id and limit
-func (d *unanswerdCallDao) GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.UnanswerdCall, error) {
+func (d *callLogDao) GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.UnanswerdCall, error) {
 	page := query.NewPage(0, limit, sort)
 
 	records := []*model.UnanswerdCall{}
@@ -378,13 +378,13 @@ func (d *unanswerdCallDao) GetByLastID(ctx context.Context, lastID uint64, limit
 }
 
 // CreateByTx create a record in the database using the provided transaction
-func (d *unanswerdCallDao) CreateByTx(ctx context.Context, tx *gorm.DB, table *model.UnanswerdCall) (uint64, error) {
+func (d *callLogDao) CreateByTx(ctx context.Context, tx *gorm.DB, table *model.UnanswerdCall) (uint64, error) {
 	err := tx.WithContext(ctx).Create(table).Error
 	return table.ID, err
 }
 
 // DeleteByTx delete a record by id in the database using the provided transaction
-func (d *unanswerdCallDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error {
+func (d *callLogDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error {
 	update := map[string]interface{}{
 		"deleted_at": time.Now(),
 	}
@@ -400,7 +400,7 @@ func (d *unanswerdCallDao) DeleteByTx(ctx context.Context, tx *gorm.DB, id uint6
 }
 
 // UpdateByTx update a record by id in the database using the provided transaction
-func (d *unanswerdCallDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UnanswerdCall) error {
+func (d *callLogDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.UnanswerdCall) error {
 	err := d.updateDataByID(ctx, tx, table)
 
 	// delete cache
@@ -408,7 +408,7 @@ func (d *unanswerdCallDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *m
 
 	return err
 }
-func (d *unanswerdCallDao) GetChildrenByUserID(ctx context.Context, UserID string) ([]model.GroupClient, error) {
+func (d *callLogDao) GetChildrenByUserID(ctx context.Context, UserID string) ([]model.GroupClient, error) {
 	var distributionRecord model.Distribution
 	err := d.db.WithContext(ctx).Model(&model.Distribution{}).Where("user_id =?", UserID).First(&distributionRecord).Error
 	if err != nil {

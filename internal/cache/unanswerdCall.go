@@ -14,12 +14,12 @@ import (
 
 const (
 	// cache prefix key, must end with a colon
-	unanswerdCallCachePrefixKey = "unanswerdCall:"
+	callLogCachePrefixKey = "callLog:"
 	// UnanswerdCallExpireTime expire time
 	UnanswerdCallExpireTime = 5 * time.Minute
 )
 
-var _ UnanswerdCallCache = (*unanswerdCallCache)(nil)
+var _ UnanswerdCallCache = (*callLogCache)(nil)
 
 // UnanswerdCallCache cache interface
 type UnanswerdCallCache interface {
@@ -31,8 +31,8 @@ type UnanswerdCallCache interface {
 	SetCacheWithNotFound(ctx context.Context, id uint64) error
 }
 
-// unanswerdCallCache define a cache struct
-type unanswerdCallCache struct {
+// callLogCache define a cache struct
+type callLogCache struct {
 	cache cache.Cache
 }
 
@@ -47,24 +47,24 @@ func NewUnanswerdCallCache(cacheType *model.CacheType) UnanswerdCallCache {
 		c := cache.NewRedisCache(cacheType.Rdb, cachePrefix, jsonEncoding, func() interface{} {
 			return &model.UnanswerdCall{}
 		})
-		return &unanswerdCallCache{cache: c}
+		return &callLogCache{cache: c}
 	case "memory":
 		c := cache.NewMemoryCache(cachePrefix, jsonEncoding, func() interface{} {
 			return &model.UnanswerdCall{}
 		})
-		return &unanswerdCallCache{cache: c}
+		return &callLogCache{cache: c}
 	}
 
 	return nil // no cache
 }
 
 // GetUnanswerdCallCacheKey cache key
-func (c *unanswerdCallCache) GetUnanswerdCallCacheKey(id uint64) string {
-	return unanswerdCallCachePrefixKey + utils.Uint64ToStr(id)
+func (c *callLogCache) GetUnanswerdCallCacheKey(id uint64) string {
+	return callLogCachePrefixKey + utils.Uint64ToStr(id)
 }
 
 // Set write to cache
-func (c *unanswerdCallCache) Set(ctx context.Context, id uint64, data *model.UnanswerdCall, duration time.Duration) error {
+func (c *callLogCache) Set(ctx context.Context, id uint64, data *model.UnanswerdCall, duration time.Duration) error {
 	if data == nil || id == 0 {
 		return nil
 	}
@@ -77,7 +77,7 @@ func (c *unanswerdCallCache) Set(ctx context.Context, id uint64, data *model.Una
 }
 
 // Get cache value
-func (c *unanswerdCallCache) Get(ctx context.Context, id uint64) (*model.UnanswerdCall, error) {
+func (c *callLogCache) Get(ctx context.Context, id uint64) (*model.UnanswerdCall, error) {
 	var data *model.UnanswerdCall
 	cacheKey := c.GetUnanswerdCallCacheKey(id)
 	err := c.cache.Get(ctx, cacheKey, &data)
@@ -88,7 +88,7 @@ func (c *unanswerdCallCache) Get(ctx context.Context, id uint64) (*model.Unanswe
 }
 
 // MultiSet multiple set cache
-func (c *unanswerdCallCache) MultiSet(ctx context.Context, data []*model.UnanswerdCall, duration time.Duration) error {
+func (c *callLogCache) MultiSet(ctx context.Context, data []*model.UnanswerdCall, duration time.Duration) error {
 	valMap := make(map[string]interface{})
 	for _, v := range data {
 		cacheKey := c.GetUnanswerdCallCacheKey(v.ID)
@@ -104,7 +104,7 @@ func (c *unanswerdCallCache) MultiSet(ctx context.Context, data []*model.Unanswe
 }
 
 // MultiGet multiple get cache, return key in map is id value
-func (c *unanswerdCallCache) MultiGet(ctx context.Context, ids []uint64) (map[uint64]*model.UnanswerdCall, error) {
+func (c *callLogCache) MultiGet(ctx context.Context, ids []uint64) (map[uint64]*model.UnanswerdCall, error) {
 	var keys []string
 	for _, v := range ids {
 		cacheKey := c.GetUnanswerdCallCacheKey(v)
@@ -129,7 +129,7 @@ func (c *unanswerdCallCache) MultiGet(ctx context.Context, ids []uint64) (map[ui
 }
 
 // Del delete cache
-func (c *unanswerdCallCache) Del(ctx context.Context, id uint64) error {
+func (c *callLogCache) Del(ctx context.Context, id uint64) error {
 	cacheKey := c.GetUnanswerdCallCacheKey(id)
 	err := c.cache.Del(ctx, cacheKey)
 	if err != nil {
@@ -139,7 +139,7 @@ func (c *unanswerdCallCache) Del(ctx context.Context, id uint64) error {
 }
 
 // SetCacheWithNotFound set empty cache
-func (c *unanswerdCallCache) SetCacheWithNotFound(ctx context.Context, id uint64) error {
+func (c *callLogCache) SetCacheWithNotFound(ctx context.Context, id uint64) error {
 	cacheKey := c.GetUnanswerdCallCacheKey(id)
 	err := c.cache.SetCacheWithNotFound(ctx, cacheKey)
 	if err != nil {

@@ -699,7 +699,7 @@ definitions:
       data:
         description: return data
         properties:
-          unanswerdCall:
+          callLog:
             $ref: '#/definitions/types.UnanswerdCallObjDetail'
         type: object
       msg:
@@ -714,7 +714,7 @@ definitions:
       data:
         description: return data
         properties:
-          unanswerdCall:
+          callLog:
             $ref: '#/definitions/types.UnanswerdCallObjDetail'
         type: object
       msg:
@@ -1056,7 +1056,7 @@ definitions:
       data:
         description: return data
         properties:
-          unanswerdCalls:
+          callLogs:
             items:
               $ref: '#/definitions/types.UnanswerdCallObjDetail'
             type: array
@@ -1073,7 +1073,7 @@ definitions:
       data:
         description: return data
         properties:
-          unanswerdCalls:
+          callLogs:
             items:
               $ref: '#/definitions/types.UnanswerdCallObjDetail'
             type: array
@@ -2729,13 +2729,13 @@ paths:
       summary: list of smss by batch id
       tags:
       - sms
-  /api/v1/unanswerdCall:
+  /api/v1/callLog:
     post:
       consumes:
       - application/json
-      description: submit information to create unanswerdCall
+      description: submit information to create callLog
       parameters:
-      - description: unanswerdCall information
+      - description: callLog information
         in: body
         name: data
         required: true
@@ -2750,14 +2750,14 @@ paths:
             $ref: '#/definitions/types.CreateUnanswerdCallRespond'
       security:
       - BearerAuth: []
-      summary: create unanswerdCall
+      summary: create callLog
       tags:
-      - unanswerdCall
-  /api/v1/unanswerdCall/{id}:
+      - callLog
+  /api/v1/callLog/{id}:
     delete:
       consumes:
       - application/json
-      description: delete unanswerdCall by id
+      description: delete callLog by id
       parameters:
       - description: id
         in: path
@@ -2773,13 +2773,13 @@ paths:
             $ref: '#/definitions/types.DeleteUnanswerdCallByIDRespond'
       security:
       - BearerAuth: []
-      summary: delete unanswerdCall
+      summary: delete callLog
       tags:
-      - unanswerdCall
+      - callLog
     get:
       consumes:
       - application/json
-      description: get unanswerdCall detail by id
+      description: get callLog detail by id
       parameters:
       - description: id
         in: path
@@ -2795,20 +2795,20 @@ paths:
             $ref: '#/definitions/types.GetUnanswerdCallByIDRespond'
       security:
       - BearerAuth: []
-      summary: get unanswerdCall detail
+      summary: get callLog detail
       tags:
-      - unanswerdCall
+      - callLog
     put:
       consumes:
       - application/json
-      description: update unanswerdCall information by id
+      description: update callLog information by id
       parameters:
       - description: id
         in: path
         name: id
         required: true
         type: string
-      - description: unanswerdCall information
+      - description: callLog information
         in: body
         name: data
         required: true
@@ -2823,14 +2823,14 @@ paths:
             $ref: '#/definitions/types.UpdateUnanswerdCallByIDRespond'
       security:
       - BearerAuth: []
-      summary: update unanswerdCall
+      summary: update callLog
       tags:
-      - unanswerdCall
-  /api/v1/unanswerdCall/condition:
+      - callLog
+  /api/v1/callLog/condition:
     post:
       consumes:
       - application/json
-      description: get unanswerdCall by condition
+      description: get callLog by condition
       parameters:
       - description: query condition
         in: body
@@ -2847,14 +2847,14 @@ paths:
             $ref: '#/definitions/types.GetUnanswerdCallByConditionRespond'
       security:
       - BearerAuth: []
-      summary: get unanswerdCall by condition
+      summary: get callLog by condition
       tags:
-      - unanswerdCall
-  /api/v1/unanswerdCall/delete/ids:
+      - callLog
+  /api/v1/callLog/delete/ids:
     post:
       consumes:
       - application/json
-      description: delete unanswerdCalls by batch id
+      description: delete callLogs by batch id
       parameters:
       - description: id array
         in: body
@@ -2871,14 +2871,14 @@ paths:
             $ref: '#/definitions/types.DeleteUnanswerdCallsByIDsRespond'
       security:
       - BearerAuth: []
-      summary: delete unanswerdCalls
+      summary: delete callLogs
       tags:
-      - unanswerdCall
-  /api/v1/unanswerdCall/list:
+      - callLog
+  /api/v1/callLog/list:
     get:
       consumes:
       - application/json
-      description: list of unanswerdCalls by last id and limit
+      description: list of callLogs by last id and limit
       parameters:
       - default: 0
         description: last id, default is MaxInt32
@@ -2905,13 +2905,13 @@ paths:
             $ref: '#/definitions/types.ListUnanswerdCallsRespond'
       security:
       - BearerAuth: []
-      summary: list of unanswerdCalls by last id and limit
+      summary: list of callLogs by last id and limit
       tags:
-      - unanswerdCall
+      - callLog
     post:
       consumes:
       - application/json
-      description: list of unanswerdCalls by paging and conditions
+      description: list of callLogs by paging and conditions
       parameters:
       - description: query parameters
         in: body
@@ -2928,14 +2928,14 @@ paths:
             $ref: '#/definitions/types.ListUnanswerdCallsRespond'
       security:
       - BearerAuth: []
-      summary: list of unanswerdCalls by query parameters
+      summary: list of callLogs by query parameters
       tags:
-      - unanswerdCall
-  /api/v1/unanswerdCall/list/ids:
+      - callLog
+  /api/v1/callLog/list/ids:
     post:
       consumes:
       - application/json
-      description: list of unanswerdCalls by batch id
+      description: list of callLogs by batch id
       parameters:
       - description: id array
         in: body
@@ -2952,9 +2952,9 @@ paths:
             $ref: '#/definitions/types.ListUnanswerdCallsByIDsRespond'
       security:
       - BearerAuth: []
-      summary: list of unanswerdCalls by batch id
+      summary: list of callLogs by batch id
       tags:
-      - unanswerdCall
+      - callLog
   /api/v1/user:
     post:
       consumes:

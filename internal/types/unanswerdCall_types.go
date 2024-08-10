@@ -53,7 +53,7 @@ type GetUnanswerdCallByIDRespond struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
-		UnanswerdCall UnanswerdCallObjDetail `json:"unanswerdCall"`
+		UnanswerdCall UnanswerdCallObjDetail `json:"callLog"`
 	} `json:"data"` // return data
 }
 
@@ -77,7 +77,7 @@ type ListUnanswerdCallsRespond struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
-		UnanswerdCalls []UnanswerdCallObjDetail `json:"unanswerdCalls"`
+		UnanswerdCalls []UnanswerdCallObjDetail `json:"callLogs"`
 	} `json:"data"` // return data
 }
 
@@ -96,7 +96,7 @@ type GetUnanswerdCallByConditionRespond struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
-		UnanswerdCall UnanswerdCallObjDetail `json:"unanswerdCall"`
+		UnanswerdCall UnanswerdCallObjDetail `json:"callLog"`
 	} `json:"data"` // return data
 }
 
@@ -110,6 +110,6 @@ type ListUnanswerdCallsByIDsRespond struct {
 	Code int    `json:"code"` // return code
 	Msg  string `json:"msg"`  // return information description
 	Data struct {
-		UnanswerdCalls []UnanswerdCallObjDetail `json:"unanswerdCalls"`
+		UnanswerdCalls []UnanswerdCallObjDetail `json:"callLogs"`
 	} `json:"data"` // return data
 }

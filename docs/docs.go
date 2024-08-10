@@ -2181,14 +2181,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/unanswerdCall": {
+        "/api/v1/callLog": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "submit information to create unanswerdCall",
+                "description": "submit information to create callLog",
                 "consumes": [
                     "application/json"
                 ],
@@ -2196,12 +2196,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "create unanswerdCall",
+                "summary": "create callLog",
                 "parameters": [
                     {
-                        "description": "unanswerdCall information",
+                        "description": "callLog information",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -2220,14 +2220,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/unanswerdCall/condition": {
+        "/api/v1/callLog/condition": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "get unanswerdCall by condition",
+                "description": "get callLog by condition",
                 "consumes": [
                     "application/json"
                 ],
@@ -2235,9 +2235,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "get unanswerdCall by condition",
+                "summary": "get callLog by condition",
                 "parameters": [
                     {
                         "description": "query condition",
@@ -2259,14 +2259,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/unanswerdCall/delete/ids": {
+        "/api/v1/callLog/delete/ids": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "delete unanswerdCalls by batch id",
+                "description": "delete callLogs by batch id",
                 "consumes": [
                     "application/json"
                 ],
@@ -2274,9 +2274,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "delete unanswerdCalls",
+                "summary": "delete callLogs",
                 "parameters": [
                     {
                         "description": "id array",
@@ -2298,14 +2298,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/unanswerdCall/list": {
+        "/api/v1/callLog/list": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "list of unanswerdCalls by last id and limit",
+                "description": "list of callLogs by last id and limit",
                 "consumes": [
                     "application/json"
                 ],
@@ -2313,9 +2313,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "list of unanswerdCalls by last id and limit",
+                "summary": "list of callLogs by last id and limit",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2355,7 +2355,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "list of unanswerdCalls by paging and conditions",
+                "description": "list of callLogs by paging and conditions",
                 "consumes": [
                     "application/json"
                 ],
@@ -2363,9 +2363,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "list of unanswerdCalls by query parameters",
+                "summary": "list of callLogs by query parameters",
                 "parameters": [
                     {
                         "description": "query parameters",
@@ -2387,14 +2387,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/unanswerdCall/list/ids": {
+        "/api/v1/callLog/list/ids": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "list of unanswerdCalls by batch id",
+                "description": "list of callLogs by batch id",
                 "consumes": [
                     "application/json"
                 ],
@@ -2402,9 +2402,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "list of unanswerdCalls by batch id",
+                "summary": "list of callLogs by batch id",
                 "parameters": [
                     {
                         "description": "id array",
@@ -2426,14 +2426,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/unanswerdCall/{id}": {
+        "/api/v1/callLog/{id}": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "get unanswerdCall detail by id",
+                "description": "get callLog detail by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -2441,9 +2441,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "get unanswerdCall detail",
+                "summary": "get callLog detail",
                 "parameters": [
                     {
                         "type": "string",
@@ -2468,7 +2468,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "update unanswerdCall information by id",
+                "description": "update callLog information by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -2476,9 +2476,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "update unanswerdCall",
+                "summary": "update callLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -2488,7 +2488,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "unanswerdCall information",
+                        "description": "callLog information",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -2512,7 +2512,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "delete unanswerdCall by id",
+                "description": "delete callLog by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -2520,9 +2520,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "unanswerdCall"
+                    "callLog"
                 ],
-                "summary": "delete unanswerdCall",
+                "summary": "delete callLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -3928,7 +3928,7 @@ const docTemplate = `{
                     "description": "return data",
                     "type": "object",
                     "properties": {
-                        "unanswerdCall": {
+                        "callLog": {
                             "$ref": "#/definitions/types.UnanswerdCallObjDetail"
                         }
                     }
@@ -3950,7 +3950,7 @@ const docTemplate = `{
                     "description": "return data",
                     "type": "object",
                     "properties": {
-                        "unanswerdCall": {
+                        "callLog": {
                             "$ref": "#/definitions/types.UnanswerdCallObjDetail"
                         }
                     }
@@ -4452,7 +4452,7 @@ const docTemplate = `{
                     "description": "return data",
                     "type": "object",
                     "properties": {
-                        "unanswerdCalls": {
+                        "callLogs": {
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/types.UnanswerdCallObjDetail"
@@ -4477,7 +4477,7 @@ const docTemplate = `{
                     "description": "return data",
                     "type": "object",
                     "properties": {
-                        "unanswerdCalls": {
+                        "callLogs": {
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/types.UnanswerdCallObjDetail"

@@ -30,7 +30,7 @@ func newUnanswerdCallCache() *gotest.Cache {
 	return c
 }
 
-func Test_unanswerdCallCache_Set(t *testing.T) {
+func Test_callLogCache_Set(t *testing.T) {
 	c := newUnanswerdCallCache()
 	defer c.Close()
 
@@ -45,7 +45,7 @@ func Test_unanswerdCallCache_Set(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func Test_unanswerdCallCache_Get(t *testing.T) {
+func Test_callLogCache_Get(t *testing.T) {
 	c := newUnanswerdCallCache()
 	defer c.Close()
 
@@ -66,7 +66,7 @@ func Test_unanswerdCallCache_Get(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallCache_MultiGet(t *testing.T) {
+func Test_callLogCache_MultiGet(t *testing.T) {
 	c := newUnanswerdCallCache()
 	defer c.Close()
 
@@ -91,7 +91,7 @@ func Test_unanswerdCallCache_MultiGet(t *testing.T) {
 	}
 }
 
-func Test_unanswerdCallCache_MultiSet(t *testing.T) {
+func Test_callLogCache_MultiSet(t *testing.T) {
 	c := newUnanswerdCallCache()
 	defer c.Close()
 
@@ -106,7 +106,7 @@ func Test_unanswerdCallCache_MultiSet(t *testing.T) {
 	}
 }
 
-func Test_unanswerdCallCache_Del(t *testing.T) {
+func Test_callLogCache_Del(t *testing.T) {
 	c := newUnanswerdCallCache()
 	defer c.Close()
 
@@ -117,7 +117,7 @@ func Test_unanswerdCallCache_Del(t *testing.T) {
 	}
 }
 
-func Test_unanswerdCallCache_SetCacheWithNotFound(t *testing.T) {
+func Test_callLogCache_SetCacheWithNotFound(t *testing.T) {
 	c := newUnanswerdCallCache()
 	defer c.Close()
 

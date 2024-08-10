@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"math"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +20,7 @@ import (
 	"caller/internal/types"
 )
 
-var _ UnanswerdCallHandler = (*unanswerdCallHandler)(nil)
+var _ UnanswerdCallHandler = (*callLogHandler)(nil)
 
 // UnanswerdCallHandler defining the handler interface
 type UnanswerdCallHandler interface {
@@ -39,14 +38,14 @@ type UnanswerdCallHandler interface {
 	GetByUserID(c *gin.Context)
 }
 
-type unanswerdCallHandler struct {
+type callLogHandler struct {
 	iDao dao.UnanswerdCallDao
 	dDao dao.DistributionDao
 }
 
 // NewUnanswerdCallHandler creating the handler interface
 func NewUnanswerdCallHandler() UnanswerdCallHandler {
-	return &unanswerdCallHandler{
+	return &callLogHandler{
 		iDao: dao.NewUnanswerdCallDao(
 			model.GetDB(),
 			cache.NewUnanswerdCallCache(model.GetCacheType()),
@@ -59,16 +58,16 @@ func NewUnanswerdCallHandler() UnanswerdCallHandler {
 }
 
 // Create a record
-// @Summary create unanswerdCall
-// @Description submit information to create unanswerdCall
-// @Tags unanswerdCall
+// @Summary create callLog
+// @Description submit information to create callLog
+// @Tags callLog
 // @accept json
 // @Produce json
-// @Param data body types.CreateUnanswerdCallRequest true "unanswerdCall information"
+// @Param data body types.CreateUnanswerdCallRequest true "callLog information"
 // @Success 200 {object} types.CreateUnanswerdCallRespond{}
-// @Router /api/v1/unanswerdCall [post]
+// @Router /api/v1/callLog [post]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) Create(c *gin.Context) {
+func (h *callLogHandler) Create(c *gin.Context) {
 	form := &types.CreateUnanswerdCallRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
@@ -77,8 +76,8 @@ func (h *unanswerdCallHandler) Create(c *gin.Context) {
 		return
 	}
 
-	unanswerdCall := &model.UnanswerdCall{}
-	err = copier.Copy(unanswerdCall, form)
+	callLog := &model.UnanswerdCall{}
+	err = copier.Copy(callLog, form)
 	if err != nil {
 		response.Error(c, ecode.ErrCreateUnanswerdCall)
 		return
@@ -86,27 +85,27 @@ func (h *unanswerdCallHandler) Create(c *gin.Context) {
 	// Note: if copier.Copy cannot assign a value to a field, add it here
 
 	ctx := middleware.WrapCtx(c)
-	err = h.iDao.Create(ctx, unanswerdCall)
+	err = h.iDao.Create(ctx, callLog)
 	if err != nil {
 		logger.Error("Create error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
-	response.Success(c, gin.H{"id": unanswerdCall.ID})
+	response.Success(c, gin.H{"id": callLog.ID})
 }
 
 // DeleteByID delete a record by id
-// @Summary delete unanswerdCall
-// @Description delete unanswerdCall by id
-// @Tags unanswerdCall
+// @Summary delete callLog
+// @Description delete callLog by id
+// @Tags callLog
 // @accept json
 // @Produce json
 // @Param id path string true "id"
 // @Success 200 {object} types.DeleteUnanswerdCallByIDRespond{}
-// @Router /api/v1/unanswerdCall/{id} [delete]
+// @Router /api/v1/callLog/{id} [delete]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) DeleteByID(c *gin.Context) {
+func (h *callLogHandler) DeleteByID(c *gin.Context) {
 	_, id, isAbort := getUnanswerdCallIDFromPath(c)
 	if isAbort {
 		response.Error(c, ecode.InvalidParams)
@@ -125,17 +124,17 @@ func (h *unanswerdCallHandler) DeleteByID(c *gin.Context) {
 }
 
 // UpdateByID update information by id
-// @Summary update unanswerdCall
-// @Description update unanswerdCall information by id
-// @Tags unanswerdCall
+// @Summary update callLog
+// @Description update callLog information by id
+// @Tags callLog
 // @accept json
 // @Produce json
 // @Param id path string true "id"
-// @Param data body types.UpdateUnanswerdCallByIDRequest true "unanswerdCall information"
+// @Param data body types.UpdateUnanswerdCallByIDRequest true "callLog information"
 // @Success 200 {object} types.UpdateUnanswerdCallByIDRespond{}
-// @Router /api/v1/unanswerdCall/{id} [put]
+// @Router /api/v1/callLog/{id} [put]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) UpdateByID(c *gin.Context) {
+func (h *callLogHandler) UpdateByID(c *gin.Context) {
 	_, id, isAbort := getUnanswerdCallIDFromPath(c)
 	if isAbort {
 		response.Error(c, ecode.InvalidParams)
@@ -151,8 +150,8 @@ func (h *unanswerdCallHandler) UpdateByID(c *gin.Context) {
 	}
 	form.ID = id
 
-	unanswerdCall := &model.UnanswerdCall{}
-	err = copier.Copy(unanswerdCall, form)
+	callLog := &model.UnanswerdCall{}
+	err = copier.Copy(callLog, form)
 	if err != nil {
 		response.Error(c, ecode.ErrUpdateByIDUnanswerdCall)
 		return
@@ -160,7 +159,7 @@ func (h *unanswerdCallHandler) UpdateByID(c *gin.Context) {
 	// Note: if copier.Copy cannot assign a value to a field, add it here
 
 	ctx := middleware.WrapCtx(c)
-	err = h.iDao.UpdateByID(ctx, unanswerdCall)
+	err = h.iDao.UpdateByID(ctx, callLog)
 	if err != nil {
 		logger.Error("UpdateByID error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
@@ -171,16 +170,16 @@ func (h *unanswerdCallHandler) UpdateByID(c *gin.Context) {
 }
 
 // GetByID get a record by id
-// @Summary get unanswerdCall detail
-// @Description get unanswerdCall detail by id
-// @Tags unanswerdCall
+// @Summary get callLog detail
+// @Description get callLog detail by id
+// @Tags callLog
 // @Param id path string true "id"
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.GetUnanswerdCallByIDRespond{}
-// @Router /api/v1/unanswerdCall/{id} [get]
+// @Router /api/v1/callLog/{id} [get]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) GetByID(c *gin.Context) {
+func (h *callLogHandler) GetByID(c *gin.Context) {
 	idStr, id, isAbort := getUnanswerdCallIDFromPath(c)
 	if isAbort {
 		response.Error(c, ecode.InvalidParams)
@@ -188,7 +187,7 @@ func (h *unanswerdCallHandler) GetByID(c *gin.Context) {
 	}
 
 	ctx := middleware.WrapCtx(c)
-	unanswerdCall, err := h.iDao.GetByID(ctx, id)
+	callLog, err := h.iDao.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, model.ErrRecordNotFound) {
 			logger.Warn("GetByID not found", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
@@ -201,7 +200,7 @@ func (h *unanswerdCallHandler) GetByID(c *gin.Context) {
 	}
 
 	data := &types.UnanswerdCallObjDetail{}
-	err = copier.Copy(data, unanswerdCall)
+	err = copier.Copy(data, callLog)
 	if err != nil {
 		response.Error(c, ecode.ErrGetByIDUnanswerdCall)
 		return
@@ -209,20 +208,20 @@ func (h *unanswerdCallHandler) GetByID(c *gin.Context) {
 	// Note: if copier.Copy cannot assign a value to a field, add it here
 	data.ID = idStr
 
-	response.Success(c, gin.H{"unanswerdCall": data})
+	response.Success(c, gin.H{"callLog": data})
 }
 
 // List of records by query parameters
-// @Summary list of unanswerdCalls by query parameters
-// @Description list of unanswerdCalls by paging and conditions
-// @Tags unanswerdCall
+// @Summary list of callLogs by query parameters
+// @Description list of callLogs by paging and conditions
+// @Tags callLog
 // @accept json
 // @Produce json
 // @Param data body types.Params true "query parameters"
 // @Success 200 {object} types.ListUnanswerdCallsRespond{}
-// @Router /api/v1/unanswerdCall/list [post]
+// @Router /api/v1/callLog/list [post]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) List(c *gin.Context) {
+func (h *callLogHandler) List(c *gin.Context) {
 	form := &types.ListUnanswerdCallsRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
@@ -232,36 +231,36 @@ func (h *unanswerdCallHandler) List(c *gin.Context) {
 	}
 
 	ctx := middleware.WrapCtx(c)
-	unanswerdCalls, total, err := h.iDao.GetByColumns(ctx, &form.Params)
+	callLogs, total, err := h.iDao.GetByColumns(ctx, &form.Params)
 	if err != nil {
 		logger.Error("GetByColumns error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
-	data, err := convertUnanswerdCalls(unanswerdCalls)
+	data, err := convertUnanswerdCalls(callLogs)
 	if err != nil {
 		response.Error(c, ecode.ErrListUnanswerdCall)
 		return
 	}
 
 	response.Success(c, gin.H{
-		"unanswerdCalls": data,
-		"total":          total,
+		"callLogs": data,
+		"total":    total,
 	})
 }
 
 // DeleteByIDs delete records by batch id
-// @Summary delete unanswerdCalls
-// @Description delete unanswerdCalls by batch id
-// @Tags unanswerdCall
+// @Summary delete callLogs
+// @Description delete callLogs by batch id
+// @Tags callLog
 // @Param data body types.DeleteUnanswerdCallsByIDsRequest true "id array"
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.DeleteUnanswerdCallsByIDsRespond{}
-// @Router /api/v1/unanswerdCall/delete/ids [post]
+// @Router /api/v1/callLog/delete/ids [post]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) DeleteByIDs(c *gin.Context) {
+func (h *callLogHandler) DeleteByIDs(c *gin.Context) {
 	form := &types.DeleteUnanswerdCallsByIDsRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
@@ -282,16 +281,16 @@ func (h *unanswerdCallHandler) DeleteByIDs(c *gin.Context) {
 }
 
 // GetByCondition get a record by condition
-// @Summary get unanswerdCall by condition
-// @Description get unanswerdCall by condition
-// @Tags unanswerdCall
+// @Summary get callLog by condition
+// @Description get callLog by condition
+// @Tags callLog
 // @Param data body types.Conditions true "query condition"
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.GetUnanswerdCallByConditionRespond{}
-// @Router /api/v1/unanswerdCall/condition [post]
+// @Router /api/v1/callLog/condition [post]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) GetByCondition(c *gin.Context) {
+func (h *callLogHandler) GetByCondition(c *gin.Context) {
 	form := &types.GetUnanswerdCallByConditionRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
@@ -307,7 +306,7 @@ func (h *unanswerdCallHandler) GetByCondition(c *gin.Context) {
 	}
 
 	ctx := middleware.WrapCtx(c)
-	unanswerdCall, err := h.iDao.GetByCondition(ctx, &form.Conditions)
+	callLog, err := h.iDao.GetByCondition(ctx, &form.Conditions)
 	if err != nil {
 		if errors.Is(err, model.ErrRecordNotFound) {
 			logger.Warn("GetByCondition not found", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
@@ -320,28 +319,28 @@ func (h *unanswerdCallHandler) GetByCondition(c *gin.Context) {
 	}
 
 	data := &[]types.UnanswerdCallObjDetail{}
-	err = copier.Copy(data, unanswerdCall)
+	err = copier.Copy(data, callLog)
 	if err != nil {
 		response.Error(c, ecode.ErrGetByIDUnanswerdCall)
 		return
 	}
 	// Note: if copier.Copy cannot assign a value to a field, add it here
-	// data.ID = utils.Uint64ToStr(unanswerdCall)
+	// data.ID = utils.Uint64ToStr(callLog)
 
-	response.Success(c, gin.H{"unanswerdCall": data})
+	response.Success(c, gin.H{"callLog": data})
 }
 
 // ListByIDs list of records by batch id
-// @Summary list of unanswerdCalls by batch id
-// @Description list of unanswerdCalls by batch id
-// @Tags unanswerdCall
+// @Summary list of callLogs by batch id
+// @Description list of callLogs by batch id
+// @Tags callLog
 // @Param data body types.ListUnanswerdCallsByIDsRequest true "id array"
 // @Accept json
 // @Produce json
 // @Success 200 {object} types.ListUnanswerdCallsByIDsRespond{}
-// @Router /api/v1/unanswerdCall/list/ids [post]
+// @Router /api/v1/callLog/list/ids [post]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) ListByIDs(c *gin.Context) {
+func (h *callLogHandler) ListByIDs(c *gin.Context) {
 	form := &types.ListUnanswerdCallsByIDsRequest{}
 	err := c.ShouldBindJSON(form)
 	if err != nil {
@@ -351,43 +350,43 @@ func (h *unanswerdCallHandler) ListByIDs(c *gin.Context) {
 	}
 
 	ctx := middleware.WrapCtx(c)
-	unanswerdCallMap, err := h.iDao.GetByIDs(ctx, form.IDs)
+	callLogMap, err := h.iDao.GetByIDs(ctx, form.IDs)
 	if err != nil {
 		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
-	unanswerdCalls := []*types.UnanswerdCallObjDetail{}
+	callLogs := []*types.UnanswerdCallObjDetail{}
 	for _, id := range form.IDs {
-		if v, ok := unanswerdCallMap[id]; ok {
+		if v, ok := callLogMap[id]; ok {
 			record, err := convertUnanswerdCall(v)
 			if err != nil {
 				response.Error(c, ecode.ErrListUnanswerdCall)
 				return
 			}
-			unanswerdCalls = append(unanswerdCalls, record)
+			callLogs = append(callLogs, record)
 		}
 	}
 
 	response.Success(c, gin.H{
-		"unanswerdCalls": unanswerdCalls,
+		"callLogs": callLogs,
 	})
 }
 
 // ListByLastID get records by last id and limit
-// @Summary list of unanswerdCalls by last id and limit
-// @Description list of unanswerdCalls by last id and limit
-// @Tags unanswerdCall
+// @Summary list of callLogs by last id and limit
+// @Description list of callLogs by last id and limit
+// @Tags callLog
 // @accept json
 // @Produce json
 // @Param lastID query int true "last id, default is MaxInt32" default(0)
 // @Param limit query int false "size in each page" default(10)
 // @Param sort query string false "sort by column name of table, and the "-" sign before column name indicates reverse order" default(-id)
 // @Success 200 {object} types.ListUnanswerdCallsRespond{}
-// @Router /api/v1/unanswerdCall/list [get]
+// @Router /api/v1/callLog/list [get]
 // @Security BearerAuth
-func (h *unanswerdCallHandler) ListByLastID(c *gin.Context) {
+func (h *callLogHandler) ListByLastID(c *gin.Context) {
 	lastID := utils.StrToUint64(c.Query("lastID"))
 	if lastID == 0 {
 		lastID = math.MaxInt32
@@ -399,24 +398,25 @@ func (h *unanswerdCallHandler) ListByLastID(c *gin.Context) {
 	sort := c.Query("sort")
 
 	ctx := middleware.WrapCtx(c)
-	unanswerdCalls, err := h.iDao.GetByLastID(ctx, lastID, limit, sort)
+	callLogs, err := h.iDao.GetByLastID(ctx, lastID, limit, sort)
 	if err != nil {
 		logger.Error("GetByLastID error", logger.Err(err), logger.Uint64("latsID", lastID), logger.Int("limit", limit), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
 
-	data, err := convertUnanswerdCalls(unanswerdCalls)
+	data, err := convertUnanswerdCalls(callLogs)
 	if err != nil {
 		response.Error(c, ecode.ErrListByLastIDUnanswerdCall)
 		return
 	}
 
 	response.Success(c, gin.H{
-		"unanswerdCalls": data,
+		"callLogs": data,
 	})
 }
-func (h *unanswerdCallHandler) GetByUserID(c *gin.Context) {
+func (h *callLogHandler) GetByUserID(c *gin.Context) {
+	callLogType := c.Query("type")
 	userID, _, _ := getUnanswerdCallIDFromPath(c)
 	children, _ := h.iDao.GetChildrenByUserID(c, userID)
 	res := []*model.UnanswerdCall{}
@@ -429,11 +429,14 @@ func (h *unanswerdCallHandler) GetByUserID(c *gin.Context) {
 					Name:  "client_id",
 					Value: children[i].ClientID,
 				},
+				{
+					Name:  "type",
+					Value: callLogType,
+				},
 			},
 		})
 		for _, record := range records {
 			res = append(res, record)
-			fmt.Println(res)
 		}
 	}
 	response.Success(c, gin.H{
@@ -442,7 +445,7 @@ func (h *unanswerdCallHandler) GetByUserID(c *gin.Context) {
 	})
 }
 
-func (h *unanswerdCallHandler) MultipleCreate(c *gin.Context) {
+func (h *callLogHandler) MultipleCreate(c *gin.Context) {
 	var machineId string
 	machineId = c.Request.Header.Get("machine_id")
 	// body := c.Request.Body
@@ -476,14 +479,14 @@ func getUnanswerdCallIDFromPath(c *gin.Context) (string, uint64, bool) {
 	return idStr, id, false
 }
 
-func convertUnanswerdCall(unanswerdCall *model.UnanswerdCall) (*types.UnanswerdCallObjDetail, error) {
+func convertUnanswerdCall(callLog *model.UnanswerdCall) (*types.UnanswerdCallObjDetail, error) {
 	data := &types.UnanswerdCallObjDetail{}
-	err := copier.Copy(data, unanswerdCall)
+	err := copier.Copy(data, callLog)
 	if err != nil {
 		return nil, err
 	}
 	// Note: if copier.Copy cannot assign a value to a field, add it here
-	data.ID = utils.Uint64ToStr(unanswerdCall.ID)
+	data.ID = utils.Uint64ToStr(callLog.ID)
 	return data, nil
 }
 

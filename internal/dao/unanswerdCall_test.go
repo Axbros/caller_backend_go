@@ -37,7 +37,7 @@ func newUnanswerdCallDao() *gotest.Dao {
 	return d
 }
 
-func Test_unanswerdCallDao_Create(t *testing.T) {
+func Test_callLogDao_Create(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -54,7 +54,7 @@ func Test_unanswerdCallDao_Create(t *testing.T) {
 	}
 }
 
-func Test_unanswerdCallDao_DeleteByID(t *testing.T) {
+func Test_callLogDao_DeleteByID(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -76,7 +76,7 @@ func Test_unanswerdCallDao_DeleteByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallDao_UpdateByID(t *testing.T) {
+func Test_callLogDao_UpdateByID(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -98,7 +98,7 @@ func Test_unanswerdCallDao_UpdateByID(t *testing.T) {
 
 }
 
-func Test_unanswerdCallDao_GetByID(t *testing.T) {
+func Test_callLogDao_GetByID(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -135,7 +135,7 @@ func Test_unanswerdCallDao_GetByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallDao_GetByColumns(t *testing.T) {
+func Test_callLogDao_GetByColumns(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -174,12 +174,12 @@ func Test_unanswerdCallDao_GetByColumns(t *testing.T) {
 	assert.Error(t, err)
 
 	// error test
-	dao := &unanswerdCallDao{}
+	dao := &callLogDao{}
 	_, _, err = dao.GetByColumns(context.Background(), &query.Params{Columns: []query.Column{{}}})
 	t.Log(err)
 }
 
-func Test_unanswerdCallDao_DeleteByIDs(t *testing.T) {
+func Test_callLogDao_DeleteByIDs(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -200,7 +200,7 @@ func Test_unanswerdCallDao_DeleteByIDs(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallDao_GetByCondition(t *testing.T) {
+func Test_callLogDao_GetByCondition(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -245,7 +245,7 @@ func Test_unanswerdCallDao_GetByCondition(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallDao_GetByIDs(t *testing.T) {
+func Test_callLogDao_GetByIDs(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -271,7 +271,7 @@ func Test_unanswerdCallDao_GetByIDs(t *testing.T) {
 	}
 }
 
-func Test_unanswerdCallDao_GetByLastID(t *testing.T) {
+func Test_callLogDao_GetByLastID(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -296,7 +296,7 @@ func Test_unanswerdCallDao_GetByLastID(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallDao_CreateByTx(t *testing.T) {
+func Test_callLogDao_CreateByTx(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -313,7 +313,7 @@ func Test_unanswerdCallDao_CreateByTx(t *testing.T) {
 	}
 }
 
-func Test_unanswerdCallDao_DeleteByTx(t *testing.T) {
+func Test_callLogDao_DeleteByTx(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)
@@ -331,7 +331,7 @@ func Test_unanswerdCallDao_DeleteByTx(t *testing.T) {
 	}
 }
 
-func Test_unanswerdCallDao_UpdateByTx(t *testing.T) {
+func Test_callLogDao_UpdateByTx(t *testing.T) {
 	d := newUnanswerdCallDao()
 	defer d.Close()
 	testData := d.TestData.(*model.UnanswerdCall)

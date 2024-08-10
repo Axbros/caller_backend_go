@@ -8,24 +8,24 @@ import (
 
 func init() {
 	apiV1RouterFns = append(apiV1RouterFns, func(group *gin.RouterGroup) {
-		unanswerdCallRouter(group, handler.NewUnanswerdCallHandler())
+		callLogRouter(group, handler.NewUnanswerdCallHandler())
 	})
 }
 
-func unanswerdCallRouter(group *gin.RouterGroup, h handler.UnanswerdCallHandler) {
+func callLogRouter(group *gin.RouterGroup, h handler.UnanswerdCallHandler) {
 	//group.Use(middleware.Auth()) // all of the following routes use jwt authentication
 	// or group.Use(middleware.Auth(middleware.WithVerify(verify))) // token authentication
 
-	group.POST("/unanswerdCall", h.Create)
-	group.POST("/unanswerdCall/fromDevice", h.MultipleCreate)
-	group.DELETE("/unanswerdCall/:id", h.DeleteByID)
-	group.PUT("/unanswerdCall/:id", h.UpdateByID)
-	group.GET("/unanswerdCall/:id", h.GetByID)
-	group.POST("/unanswerdCall/list", h.List)
+	group.POST("/callLog", h.Create)
+	group.POST("/callLog/fromDevice", h.MultipleCreate)
+	group.DELETE("/callLog/:id", h.DeleteByID)
+	group.PUT("/callLog/:id", h.UpdateByID)
+	group.GET("/callLog/:id", h.GetByID)
+	group.POST("/callLog/list", h.List)
 
-	group.POST("/unanswerdCall/delete/ids", h.DeleteByIDs)
-	group.POST("/unanswerdCall/condition", h.GetByCondition)
-	group.POST("/unanswerdCall/list/ids", h.ListByIDs)
-	group.GET("/unanswerdCall/list", h.ListByLastID)
-	group.GET("/unanswerdCall/byUserId/:id", h.GetByUserID)
+	group.POST("/callLog/delete/ids", h.DeleteByIDs)
+	group.POST("/callLog/condition", h.GetByCondition)
+	group.POST("/callLog/list/ids", h.ListByIDs)
+	group.GET("/callLog/list", h.ListByLastID)
+	group.GET("/callLog/byUserId/:id", h.GetByUserID)
 }

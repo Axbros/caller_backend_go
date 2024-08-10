@@ -40,62 +40,62 @@ func newUnanswerdCallHandler() *gotest.Handler {
 
 	// init mock handler
 	h := gotest.NewHandler(d, testData)
-	h.IHandler = &unanswerdCallHandler{iDao: d.IDao.(dao.UnanswerdCallDao)}
+	h.IHandler = &callLogHandler{iDao: d.IDao.(dao.UnanswerdCallDao)}
 	iHandler := h.IHandler.(UnanswerdCallHandler)
 
 	testFns := []gotest.RouterInfo{
 		{
 			FuncName:    "Create",
 			Method:      http.MethodPost,
-			Path:        "/unanswerdCall",
+			Path:        "/callLog",
 			HandlerFunc: iHandler.Create,
 		},
 		{
 			FuncName:    "DeleteByID",
 			Method:      http.MethodDelete,
-			Path:        "/unanswerdCall/:id",
+			Path:        "/callLog/:id",
 			HandlerFunc: iHandler.DeleteByID,
 		},
 		{
 			FuncName:    "UpdateByID",
 			Method:      http.MethodPut,
-			Path:        "/unanswerdCall/:id",
+			Path:        "/callLog/:id",
 			HandlerFunc: iHandler.UpdateByID,
 		},
 		{
 			FuncName:    "GetByID",
 			Method:      http.MethodGet,
-			Path:        "/unanswerdCall/:id",
+			Path:        "/callLog/:id",
 			HandlerFunc: iHandler.GetByID,
 		},
 		{
 			FuncName:    "List",
 			Method:      http.MethodPost,
-			Path:        "/unanswerdCall/list",
+			Path:        "/callLog/list",
 			HandlerFunc: iHandler.List,
 		},
 		{
 			FuncName:    "DeleteByIDs",
 			Method:      http.MethodPost,
-			Path:        "/unanswerdCall/delete/ids",
+			Path:        "/callLog/delete/ids",
 			HandlerFunc: iHandler.DeleteByIDs,
 		},
 		{
 			FuncName:    "GetByCondition",
 			Method:      http.MethodPost,
-			Path:        "/unanswerdCall/condition",
+			Path:        "/callLog/condition",
 			HandlerFunc: iHandler.GetByCondition,
 		},
 		{
 			FuncName:    "ListByIDs",
 			Method:      http.MethodPost,
-			Path:        "/unanswerdCall/list/ids",
+			Path:        "/callLog/list/ids",
 			HandlerFunc: iHandler.ListByIDs,
 		},
 		{
 			FuncName:    "ListByLastID",
 			Method:      http.MethodGet,
-			Path:        "/unanswerdCall/list",
+			Path:        "/callLog/list",
 			HandlerFunc: iHandler.ListByLastID,
 		},
 	}
@@ -106,7 +106,7 @@ func newUnanswerdCallHandler() *gotest.Handler {
 	return h
 }
 
-func Test_unanswerdCallHandler_Create(t *testing.T) {
+func Test_callLogHandler_Create(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := &types.CreateUnanswerdCallRequest{}
@@ -129,7 +129,7 @@ func Test_unanswerdCallHandler_Create(t *testing.T) {
 
 }
 
-func Test_unanswerdCallHandler_DeleteByID(t *testing.T) {
+func Test_callLogHandler_DeleteByID(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UnanswerdCall)
@@ -160,7 +160,7 @@ func Test_unanswerdCallHandler_DeleteByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallHandler_UpdateByID(t *testing.T) {
+func Test_callLogHandler_UpdateByID(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := &types.UpdateUnanswerdCallByIDRequest{}
@@ -190,7 +190,7 @@ func Test_unanswerdCallHandler_UpdateByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallHandler_GetByID(t *testing.T) {
+func Test_callLogHandler_GetByID(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UnanswerdCall)
@@ -221,7 +221,7 @@ func Test_unanswerdCallHandler_GetByID(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallHandler_List(t *testing.T) {
+func Test_callLogHandler_List(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UnanswerdCall)
@@ -258,7 +258,7 @@ func Test_unanswerdCallHandler_List(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallHandler_DeleteByIDs(t *testing.T) {
+func Test_callLogHandler_DeleteByIDs(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UnanswerdCall)
@@ -287,7 +287,7 @@ func Test_unanswerdCallHandler_DeleteByIDs(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallHandler_GetByCondition(t *testing.T) {
+func Test_callLogHandler_GetByCondition(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UnanswerdCall)
@@ -334,7 +334,7 @@ func Test_unanswerdCallHandler_GetByCondition(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallHandler_ListByIDs(t *testing.T) {
+func Test_callLogHandler_ListByIDs(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UnanswerdCall)
@@ -362,7 +362,7 @@ func Test_unanswerdCallHandler_ListByIDs(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Test_unanswerdCallHandler_ListByLastID(t *testing.T) {
+func Test_callLogHandler_ListByLastID(t *testing.T) {
 	h := newUnanswerdCallHandler()
 	defer h.Close()
 	testData := h.TestData.(*model.UnanswerdCall)

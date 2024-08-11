@@ -67,6 +67,11 @@ func (d *userDao) deleteCache(ctx context.Context, id uint64) error {
 
 // Create a record, insert the record and the id value is written back to the table
 func (d *userDao) Create(ctx context.Context, table *model.User) error {
+	record := &model.User{}
+	isExist := d.db.WithContext(ctx).Where("machine_code =?", table.MachineCode).First(record)
+	if isExist.RowsAffected > 0 {
+		return errors.New("用户已存在")
+	}
 	return d.db.WithContext(ctx).Create(table).Error
 }
 

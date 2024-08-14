@@ -22,7 +22,7 @@ var _ SmsDao = (*smsDao)(nil)
 // SmsDao defining the dao interface
 type SmsDao interface {
 	Create(ctx context.Context, table *model.Sms) error
-	DeleteByID(ctx context.Context, id uint64) error
+	DeleteByMachineIdAndAddress(ctx context.Context, machineID string, address string) error
 	UpdateByID(ctx context.Context, table *model.Sms) error
 	GetByID(ctx context.Context, id uint64) (*model.Sms, error)
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.Sms, int64, error)
@@ -68,14 +68,14 @@ func (d *smsDao) Create(ctx context.Context, table *model.Sms) error {
 }
 
 // DeleteByID delete a record by id
-func (d *smsDao) DeleteByID(ctx context.Context, id uint64) error {
-	err := d.db.WithContext(ctx).Where("id = ?", id).Delete(&model.Sms{}).Error
+func (d *smsDao) DeleteByMachineIdAndAddress(ctx context.Context, machineID string, address string) error {
+	err := d.db.WithContext(ctx).Where("machine_code = ? and address = ?", machineID, address).Delete(&model.Sms{}).Error
 	if err != nil {
 		return err
 	}
 
 	// delete cache
-	_ = d.deleteCache(ctx, id)
+	// _ = d.deleteCache(ctx, id)
 
 	return nil
 }

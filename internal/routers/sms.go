@@ -17,7 +17,8 @@ func smsRouter(group *gin.RouterGroup, h handler.SmsHandler) {
 	// or group.Use(middleware.Auth(middleware.WithVerify(verify))) // token authentication
 
 	group.POST("/sms", h.Create)
-	group.DELETE("/sms/:id", h.DeleteByID)
+	group.DELETE("/sms/:machine_id/:address", h.DeleteByMachineIdAndAddress)
+
 	group.PUT("/sms/:id", h.UpdateByID)
 	group.GET("/sms/:id", h.GetByID)
 	group.POST("/sms/list", h.List)

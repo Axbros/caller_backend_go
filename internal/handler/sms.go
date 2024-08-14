@@ -24,7 +24,7 @@ var _ SmsHandler = (*smsHandler)(nil)
 // SmsHandler defining the handler interface
 type SmsHandler interface {
 	Create(c *gin.Context)
-	DeleteByID(c *gin.Context)
+	DeleteByMachineIdAndAddress(c *gin.Context)
 	UpdateByID(c *gin.Context)
 	GetByID(c *gin.Context)
 	List(c *gin.Context)
@@ -97,17 +97,18 @@ func (h *smsHandler) Create(c *gin.Context) {
 // @Success 200 {object} types.DeleteSmsByIDRespond{}
 // @Router /api/v1/sms/{id} [delete]
 // @Security BearerAuth
-func (h *smsHandler) DeleteByID(c *gin.Context) {
-	_, id, isAbort := getSmsIDFromPath(c)
-	if isAbort {
+func (h *smsHandler) DeleteByMachineIdAndAddress(c *gin.Context) {
+	machineID := getMachineIDFromPath(c)
+	address := getAddressFromPath(c)
+	if machineID == "" {
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
 
 	ctx := middleware.WrapCtx(c)
-	err := h.iDao.DeleteByID(ctx, id)
+	err := h.iDao.DeleteByMachineIdAndAddress(ctx, machineID, address)
 	if err != nil {
-		logger.Error("DeleteByID error", logger.Err(err), logger.Any("id", id), middleware.GCtxRequestIDField(c))
+		logger.Error("DeleteByID error", logger.Err(err), logger.Any("machineID", machineID), logger.Any("address", address), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
@@ -417,6 +418,16 @@ func getSmsIDFromPath(c *gin.Context) (string, uint64, bool) {
 	}
 
 	return idStr, id, false
+}
+
+func getMachineIDFromPath(c *gin.Context) string {
+	idStr := c.Param("machine_id")
+	return idStr
+}
+
+func getAddressFromPath(c *gin.Context) string {
+	idStr := c.Param("address")
+	return idStr
 }
 
 func convertSms(sms *model.Sms) (*types.SmsObjDetail, error) {

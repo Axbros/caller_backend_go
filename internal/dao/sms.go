@@ -103,14 +103,14 @@ func (d *smsDao) updateDataByID(ctx context.Context, db *gorm.DB, table *model.S
 	if table.Address != "" {
 		update["address"] = table.Address
 	}
-	if table.Date != "" {
-		update["date"] = table.Date
-	}
 	if table.Body != "" {
 		update["body"] = table.Body
 	}
 	if table.SmsType != "" {
 		update["sms_type"] = table.SmsType
+	}
+	if table.From != "" {
+		update["from"] = table.From
 	}
 
 	return db.WithContext(ctx).Model(table).Updates(update).Error

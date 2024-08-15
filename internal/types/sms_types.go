@@ -17,6 +17,7 @@ type CreateSmsRequest struct {
 	Date        string `json:"date" binding:""`
 	Body        string `json:"body" binding:""`
 	SmsType     string `json:"smsType" binding:""`
+	From        string `json:"from" binding:""`
 }
 
 // UpdateSmsByIDRequest request params

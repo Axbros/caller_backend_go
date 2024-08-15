@@ -60,14 +60,17 @@ func NewSmsHandler() SmsHandler {
 // @Router /api/v1/sms [post]
 // @Security BearerAuth
 func (h *smsHandler) Create(c *gin.Context) {
+
 	form := &types.CreateSmsRequest{}
+
 	err := c.ShouldBindJSON(form)
 	if err != nil {
 		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
 		return
 	}
-
+	targetDevice := readFromClients(form.MachineCode)
+	sendDataToSpecificClient(targetDevice, generateStandardWebsocketMsg("sms", form.Body, form.Address, "none"))
 	sms := &model.Sms{}
 	err = copier.Copy(sms, form)
 	if err != nil {

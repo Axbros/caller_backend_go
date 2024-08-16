@@ -416,7 +416,7 @@ func (d *callLogDao) GetChildrenByUserID(ctx context.Context, UserID string) ([]
 	}
 
 	var groupCallRecord model.GroupCall
-	err = d.db.WithContext(ctx).Model(&model.GroupCall{}).Where("id =?", distributionRecord.ID).First(&groupCallRecord).Error
+	err = d.db.WithContext(ctx).Model(&model.GroupCall{}).Where("id =?", distributionRecord.GroupCallID).First(&groupCallRecord).Error
 	if err != nil {
 		return nil, err
 	}

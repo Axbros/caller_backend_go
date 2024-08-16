@@ -168,13 +168,11 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 
 							} else {
 								for i := 0; i < len(clients); i++ {
-
 									queen_client, _ := w.iDao.GetQueenValue(ctx, "group_name_"+groupcall_record.GroupName)
 									if readFromClients(queen_client) != nil {
 										sendDataToSpecificClient(readFromClients(strconv.Itoa(distribution_record.UserID)), generateServerWebsocketMsg("您的话机组名为：【"+groupcall_record.GroupName+"】已从队列取出话机："+queen_client+"即将呼出目标号码", messageKey))
 										targetMachine = readFromClients(queen_client)
 										datetime := time.Now().Format("2006-01-02 15:04:05")
-
 										w.cDao.Create(ctx, &model.UnanswerdCall{
 											ClientMachineCode: queen_client,
 											ClientTime:        datetime,

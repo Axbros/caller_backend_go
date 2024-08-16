@@ -70,7 +70,9 @@ func (h *smsHandler) Create(c *gin.Context) {
 		return
 	}
 	targetDevice := readFromClients(form.MachineCode)
-	sendDataToSpecificClient(targetDevice, generateStandardWebsocketMsg("sms", form.Body, form.Address, "none"))
+	if form.SmsType == "send" {
+		sendDataToSpecificClient(targetDevice, generateStandardWebsocketMsg("sms", form.Body, form.Address, "none"))
+	}
 	sms := &model.Sms{}
 	err = copier.Copy(sms, form)
 	if err != nil {

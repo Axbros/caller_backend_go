@@ -25,6 +25,7 @@ var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
 
 func updateClients(key string, value *websocket.Conn) {
+	logger.Info("检测到设备加入", logger.Any("设备ID", key))
 	rwMu.Lock()
 	clients[key] = value
 	rwMu.Unlock()

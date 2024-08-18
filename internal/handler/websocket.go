@@ -79,7 +79,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 			for key, value := range clients {
 				if remoteAddr == value.RemoteAddr().String() {
 					deleteClient(key)
-					logger.Info("已移除设备", logger.Any("设备ID", key))
+					logger.Info("已移除设备", logger.Any("设备ID", key), logger.Any("剩余设备数量", len(clients)))
 				}
 			}
 			return

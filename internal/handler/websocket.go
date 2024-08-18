@@ -75,18 +75,12 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		_, message, err := conn.ReadMessage()
 		remoteAddr := conn.RemoteAddr().String()
 		if err != nil {
-			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-				// 处理正常的关闭情况
-				logger.Info("检测到设备断开连接", logger.Any("设备IP", remoteAddr))
-				for key, value := range clients {
-					if remoteAddr == value.RemoteAddr().String() {
-						deleteClient(key)
-						logger.Info("已移除设备", logger.Any("设备ID", key))
-					}
+			logger.Info("检测到设备断开连接", logger.Any("设备IP", remoteAddr))
+			for key, value := range clients {
+				if remoteAddr == value.RemoteAddr().String() {
+					deleteClient(key)
+					logger.Info("已移除设备", logger.Any("设备ID", key))
 				}
-			} else {
-				// 处理其他错误情况
-				fmt.Println("WebSocket 异常断开连接:", err)
 			}
 			return
 		}

@@ -41,6 +41,7 @@ func readFromClients(key string) *websocket.Conn {
 func deleteClient(key string) {
 	rwMu.Lock()
 	delete(clients, key)
+	logger.Info("已移除设备", logger.Any("设备ID", key), logger.Any("剩余设备数量", len(clients)))
 	rwMu.Unlock()
 }
 
@@ -77,10 +78,11 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		remoteAddr := conn.RemoteAddr().String()
 		if err != nil {
 			logger.Info("检测到设备断开连接", logger.Any("设备IP", remoteAddr))
-			for key, value := range clients {
-				if remoteAddr == value.RemoteAddr().String() {
+			for key, _ := range clients {
+				conn := readFromClients(key)
+				if conn != nil && conn.RemoteAddr().String() == remoteAddr {
+					// 执行相应的操作，比如删除客户端
 					deleteClient(key)
-					logger.Info("已移除设备", logger.Any("设备ID", key), logger.Any("剩余设备数量", len(clients)))
 				}
 			}
 			return

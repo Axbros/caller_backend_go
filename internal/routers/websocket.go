@@ -3,9 +3,10 @@ package routers
 import (
 	"caller/internal/handler"
 	"context"
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zhufuyi/sponge/pkg/ws"
-	"log"
 )
 
 func init() {
@@ -23,4 +24,5 @@ func websocketRouter(group *gin.RouterGroup, h handler.WebsocketHandler) {
 			log.Println("webSocket server error:", err)
 		}
 	})
+	group.GET("/online", h.GetOnlineClients)
 }

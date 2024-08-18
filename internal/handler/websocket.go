@@ -8,14 +8,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/zhufuyi/sponge/pkg/ggorm/query"
+	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/ws"
 )
@@ -36,8 +37,15 @@ func readFromClients(key string) *websocket.Conn {
 	return value
 }
 
+func deleteClient(key string) {
+	rwMu.Lock()
+	delete(clients, key)
+	rwMu.Unlock()
+}
+
 type WebsocketHandler interface {
 	LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
+	GetOnlineClients(ctx *gin.Context)
 }
 type websocketHandler struct {
 	iDao dao.RedisDao
@@ -67,9 +75,22 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		_, message, err := conn.ReadMessage()
 		remoteAddr := conn.RemoteAddr().String()
 		if err != nil {
-			log.Println("ReadMessage error:", err)
-			break
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+				// 处理正常的关闭情况
+				logger.Info("检测到设备断开连接", logger.Any("设备IP", remoteAddr))
+				for key, value := range clients {
+					if remoteAddr == value.RemoteAddr().String() {
+						deleteClient(key)
+						logger.Info("已移除设备", logger.Any("设备ID", key))
+					}
+				}
+			} else {
+				// 处理其他错误情况
+				fmt.Println("WebSocket 异常断开连接:", err)
+			}
+			return
 		}
+
 		// 将字节切片转换为字符串
 		messageStr := string(message)
 		// 处理消息
@@ -306,6 +327,18 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		}
 		logger.Info("websocket", logger.String("messageStr", messageStr), logger.String("remoteAddr", remoteAddr))
 	}
+}
+
+func (w websocketHandler) GetOnlineClients(c *gin.Context) {
+	res := make(map[string]string)
+	for key, value := range clients {
+		ipAddr := value.RemoteAddr().String()
+		res[key] = ipAddr
+	}
+	response.Success(c, gin.H{
+		"results": res,
+		"count":   len(res),
+	})
 }
 
 func updateHeartBeatInfo(w websocketHandler, ctx context.Context, machine_code, ip_address string) {

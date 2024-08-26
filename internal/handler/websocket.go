@@ -41,7 +41,6 @@ func readFromClients(key string) *websocket.Conn {
 func deleteClient(key string) {
 	rwMu.Lock()
 	delete(clients, key)
-	logger.Info("已移除设备", logger.Any("设备ID", key), logger.Any("剩余设备数量", len(clients)))
 	rwMu.Unlock()
 }
 
@@ -78,11 +77,10 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		remoteAddr := conn.RemoteAddr().String()
 		if err != nil {
 			logger.Info("检测到设备断开连接", logger.Any("设备IP", remoteAddr))
-			for key, _ := range clients {
-				conn := readFromClients(key)
-				if conn != nil && conn.RemoteAddr().String() == remoteAddr {
-					// 执行相应的操作，比如删除客户端
+			for key, value := range clients {
+				if remoteAddr == value.RemoteAddr().String() {
 					deleteClient(key)
+					logger.Info("已移除设备", logger.Any("设备ID", key), logger.Any("剩余设备数量", len(clients)))
 				}
 			}
 			return
@@ -299,12 +297,16 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 											},
 											)
 											sendDataToSpecificClient(readFromClients(queen_client), generateStandardWebsocketMsg("call", messageStr, "", messageKey))
+
+											sendDataToSpecificClient(conn, generateStandardWebsocketMsg("read_success", "设备读取成功", queen_client, messageKey))
+
 											break
 										} else {
 											sendDataToSpecificClient(conn, generateServerWebsocketMsg("队列话机不在线，话机ID："+queen_client+"即将队列循环到下一个话机", messageKey))
 											continue
 										}
 									}
+									sendDataToSpecificClient(conn, generateStandardWebsocketMsg("flow_done", "流程执行结束", "", messageKey))
 								}
 
 							}

@@ -253,7 +253,6 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 						}
 						if eventStr == "call" {
 							to := dataMap["to"].(string)
-
 							//这里面的data就是本机userID
 							w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
 							sendDataToSpecificClient(conn, generateServerWebsocketMsg("服务端收到指令，正在配置中转设备", messageKey))
@@ -306,9 +305,8 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 											continue
 										}
 									}
-									sendDataToSpecificClient(conn, generateStandardWebsocketMsg("flow_done", "流程执行结束", "", messageKey))
 								}
-
+								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("flow_done", "流程执行结束", "", messageKey))
 							}
 						}
 					}

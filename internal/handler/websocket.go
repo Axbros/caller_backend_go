@@ -127,12 +127,12 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							if parent.ID > 0 {
 								dataMap["to"] = parentIdStr
 								//把指令放在redis存储 当receive方收到之后执行Delete操作
-								redisStoreKey := parentIdStr + ":" + dataMap["key"].(string)
-								w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
-								if err != nil {
-									logger.Error("存储指令到redis种失败", logger.Err(err))
-									return
-								}
+								// redisStoreKey := parentIdStr + ":" + dataMap["key"].(string)
+								// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
+								// if err != nil {
+								// 	logger.Error("存储指令到redis种失败", logger.Err(err))
+								// 	return
+								// }
 								parentConn := readFromClients(parentIdStr)
 
 								sendDataToSpecificClient(parentConn, jsonStr)
@@ -228,17 +228,17 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 						if eventStr == "receive" {               //表示用户端收到话机的指令 需要执行清除redis操作
 							w.iDao.DeleteMessageStore(ctx, redisStoreKey)
 						}
-						if eventStr == "missed" || eventStr == "outgoing" {
-							children := strings.Split(messageStr, ",")
+						// if eventStr == "missed" || eventStr == "outgoing" {
+						// 	children := strings.Split(messageStr, ",")
 
-							for _, child := range children {
-								if readFromClients(child) != nil {
-									sendDataToSpecificClient(readFromClients(child), jsonStr)
-								}
-							}
-						}
+						// 	for _, child := range children {
+						// 		if readFromClients(child) != nil {
+						// 			sendDataToSpecificClient(readFromClients(child), jsonStr)
+						// 		}
+						// 	}
+						// }
 						if eventStr == "endcall" {
-							w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
+							// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
 							//user excute endcall or answer should put the client machine code id to message,data is user machine code id
 							sendDataToSpecificClient(readFromClients(messageStr), jsonStr)
 							//这里的data其实就是client machine code
@@ -254,7 +254,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 						if eventStr == "call" {
 							to := dataMap["to"].(string)
 							//这里面的data就是本机userID
-							w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
+							// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
 							sendDataToSpecificClient(conn, generateServerWebsocketMsg("服务端收到指令，正在配置中转设备", messageKey))
 							//todo 根据userID查询中转设备
 							group := w.dDao.GetDistributedGroupCallIdByUserId(ctx, data)

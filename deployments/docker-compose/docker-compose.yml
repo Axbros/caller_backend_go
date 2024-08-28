@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   caller:
-    image: yh-caller/caller:latest
+    image: axbros/caller_go:latest
     container_name: caller
     restart: always
     command: ["./caller", "-c", "/app/configs/caller.yml"]

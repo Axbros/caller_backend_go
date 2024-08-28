@@ -38,9 +38,11 @@ function checkLogin() {
 
 checkLogin
 
+docker tag ${IMAGE_NAME_TAG} axbros/caller_go
+echo "docker tag ${IMAGE_NAME_TAG} axbros/caller_go"
 # push image to image repository
-echo "docker push ${IMAGE_NAME_TAG}"
-docker push ${IMAGE_NAME_TAG}
+echo "docker push axbros/caller_go"
+docker push axbros/caller_go
 checkResult $?
 echo "docker push image success."
 

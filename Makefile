@@ -89,7 +89,7 @@ image-build-local: build
 .PHONY: image-build
 # build image for remote repositories, use binary files to build, e.g. make image-build REPO_HOST=addr TAG=latest
 image-build:
-	@bash scripts/image-build.sh $(REPO_HOST) $(TAG)
+	@bash scripts/image-build.sh hub.docker.com latest
 
 
 .PHONY: image-build2
@@ -101,7 +101,7 @@ image-build2:
 .PHONY: image-push
 # push docker image to remote repositories, e.g. make image-push REPO_HOST=addr TAG=latest
 image-push:
-	@bash scripts/image-push.sh $(REPO_HOST) $(TAG)
+	@bash scripts/image-push.sh hub.docker.com latest
 
 
 .PHONY: deploy-k8s

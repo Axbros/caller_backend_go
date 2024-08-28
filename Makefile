@@ -95,7 +95,7 @@ image-build:
 .PHONY: image-build2
 # build image for remote repositories, phase II build, e.g. make image-build2 REPO_HOST=addr TAG=latest
 image-build2:
-	@bash scripts/image-build2.sh $(REPO_HOST) $(TAG)
+	@bash scripts/image-build2.sh hub.docker.com latest
 
 
 .PHONY: image-push

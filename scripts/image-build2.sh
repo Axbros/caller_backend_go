@@ -26,8 +26,8 @@ IMAGE_NAME_TAG="${REPO_HOST}/${IMAGE_NAME}:${TAG}"
 PROJECT_FILES=$(ls)
 tar zcf ${serverName}.tar.gz ${PROJECT_FILES}
 mv -f ${serverName}.tar.gz ${DOCKERFILE_PATH}
-echo "docker build --force-rm -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH}"
-docker build --force-rm -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH}
+echo "docker build --force-rm -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH} "
+docker build --force-rm -f ${DOCKERFILE} -t ${IMAGE_NAME_TAG} ${DOCKERFILE_PATH} 
 rm -rf ${DOCKERFILE_PATH}/${serverName}.tar.gz
 # delete none image
 noneImages=$(docker images | grep "<none>" | awk '{print $3}')

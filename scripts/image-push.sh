@@ -36,7 +36,7 @@ function checkLogin() {
   fi
 }
 
-checkLogin
+# checkLogin
 
 # push image to image repository
 echo "docker push ${IMAGE_NAME_TAG}"

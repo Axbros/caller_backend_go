@@ -71,6 +71,7 @@ func (d *userDao) Create(ctx context.Context, table *model.User) error {
 	isExist := d.db.WithContext(ctx).Where("machine_code =?", table.MachineCode).First(record)
 	if isExist.RowsAffected > 0 {
 		return errors.New("用户已存在")
+		// return response.Error(c, ecode.ErrCreateGroupClient)
 	}
 	return d.db.WithContext(ctx).Create(table).Error
 }

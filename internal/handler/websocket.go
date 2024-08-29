@@ -305,6 +305,9 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 									}
 								}
 								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("flow_done", "流程执行结束", "", messageKey))
+							} else {
+								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("404", "当前未查询到您的绑定关系，请联系管理员核实。", "", "oh_no"))
+								// sendDataToSpecificClient(conn, generateStandardWebsocketMsg("查询到已采用中转方案，正在获取中转信息", messageKey))
 							}
 						}
 					}

@@ -110,7 +110,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 					if eventStr == "heartbeat" {
 						// clients[dataStr] = conn
 						updateClients(dataStr, conn)
-						updateHeartBeatInfo(w, ctx, dataStr, remoteAddr)
+						// updateHeartBeatInfo(w, ctx, dataStr, remoteAddr)
 					}
 
 					if userTypeStr == "client" { //处理客户端的消息
@@ -335,13 +335,13 @@ func (w websocketHandler) GetOnlineClients(c *gin.Context) {
 	})
 }
 
-func updateHeartBeatInfo(w websocketHandler, ctx context.Context, machine_code, ip_address string) {
-	err := w.iDao.SetIPAddrByMachineCode2WebsocketConnections(ctx, machine_code, ip_address)
-	if err != nil {
-		logger.Errorf("set connection error %s", "heartbeat", logger.Err(err))
-		return
-	}
-}
+// func updateHeartBeatInfo(w websocketHandler, ctx context.Context, machine_code, ip_address string) {
+// 	err := w.iDao.SetIPAddrByMachineCode2WebsocketConnections(ctx, machine_code, ip_address)
+// 	if err != nil {
+// 		logger.Errorf("set connection error %s", "heartbeat", logger.Err(err))
+// 		return
+// 	}
+// }
 
 func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
 	logger.Info("websocket", logger.String("send to", conn.RemoteAddr().String()), logger.String("message", string(message)))

@@ -14,7 +14,7 @@ var _ RedisDao = (*redisDao)(nil)
 
 // RedisDao defining the dao interface
 type RedisDao interface {
-	SetIPAddrByMachineCode2WebsocketConnections(ctx context.Context, key string, value string) error
+	// SetIPAddrByMachineCode2WebsocketConnections(ctx context.Context, key string, value string) error
 	GetIPAddrByMachineCodeFromWebsocketConnections(ctx context.Context, key string) (string, error)
 	SetMessageStore(ctx context.Context, key string, value interface{}) error
 	DeleteMessageStore(ctx context.Context, key string) error
@@ -39,15 +39,15 @@ func NewRedisDao(client *redis.Client) RedisDao {
 	}
 }
 
-func (r *redisDao) SetIPAddrByMachineCode2WebsocketConnections(ctx context.Context, key string, value string) error {
-	// 设置 Hash 字段值
-	err := r.client.HSet(ctx, "websocket_connections", key, value).Err()
-	if err != nil {
-		logger.Errorf("设置 Hash 失败:", err)
-		return err
-	}
-	return nil
-}
+//	func (r *redisDao) SetIPAddrByMachineCode2WebsocketConnections(ctx context.Context, key string, value string) error {
+//		// 设置 Hash 字段值
+//		err := r.client.HSet(ctx, "websocket_connections", key, value).Err()
+//		if err != nil {
+//			logger.Errorf("设置 Hash 失败:", err)
+//			return err
+//		}
+//		return nil
+//	}
 func (r *redisDao) GetIPAddrByMachineCodeFromWebsocketConnections(ctx context.Context, key string) (string, error) {
 	value, err := r.client.HGet(ctx, "websocket_connections", key).Result()
 	if err == redis.Nil {

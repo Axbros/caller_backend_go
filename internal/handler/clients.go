@@ -78,14 +78,10 @@ func (h *clientsHandler) Create(c *gin.Context) {
 
 	ctx := middleware.WrapCtx(c)
 
-	exists, id, err := h.iDao.IsExist(ctx, clients)
-	if err != nil {
-		logger.Error("check isExist error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
-		return
-	}
-	if exists {
-		clients.ID = uint64(id)
-		response.Success(c, gin.H{"id": clients.ID})
+	recordID := h.iDao.IsExist(ctx, clients)
+
+	if recordID > 0 {
+		response.Success(c, gin.H{"id": recordID})
 		return
 	}
 	err = h.iDao.Create(ctx, clients)

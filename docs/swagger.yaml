@@ -1,22 +1,4 @@
 definitions:
-  types.CallHistoryObjDetail:
-    properties:
-      clientMachineCode:
-        type: string
-      createdAt:
-        type: string
-      id:
-        description: convert to string id
-        type: string
-      instruction:
-        type: string
-      mobileNumber:
-        type: string
-      requestMachineCode:
-        type: string
-      updatedAt:
-        type: string
-    type: object
   types.ClientsObjDetail:
     properties:
       createdAt:
@@ -55,37 +37,8 @@ definitions:
           $ref: '#/definitions/types.Column'
         type: array
     type: object
-  types.CreateCallHistoryRequest:
-    properties:
-      clientMachineCode:
-        type: string
-      instruction:
-        type: string
-      mobileNumber:
-        type: string
-      requestMachineCode:
-        type: string
-    type: object
-  types.CreateCallHistoryRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          id:
-            description: id
-            type: integer
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
   types.CreateClientsRequest:
     properties:
-      ipAddress:
-        type: string
       machineCode:
         type: string
     type: object
@@ -184,6 +137,8 @@ definitions:
         type: string
       date:
         type: string
+      from:
+        type: string
       machineCode:
         type: string
       smsType:
@@ -245,37 +200,6 @@ definitions:
             description: id
             type: integer
         type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.DeleteCallHistoryByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.DeleteCallHistorysByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.DeleteCallHistorysByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
       msg:
         description: return information description
         type: string
@@ -510,36 +434,6 @@ definitions:
         type: string
       userId:
         type: integer
-    type: object
-  types.GetCallHistoryByConditionRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          callHistory:
-            $ref: '#/definitions/types.CallHistoryObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.GetCallHistoryByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          callHistory:
-            $ref: '#/definitions/types.CallHistoryObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
     type: object
   types.GetClientsByConditionRespond:
     properties:
@@ -779,49 +673,6 @@ definitions:
         description: convert to string id
         type: string
       updatedAt:
-        type: string
-    type: object
-  types.ListCallHistorysByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.ListCallHistorysByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          callHistorys:
-            items:
-              $ref: '#/definitions/types.CallHistoryObjDetail'
-            type: array
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.ListCallHistorysRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          callHistorys:
-            items:
-              $ref: '#/definitions/types.CallHistoryObjDetail'
-            type: array
-        type: object
-      msg:
-        description: return information description
         type: string
     type: object
   types.ListClientssByIDsRequest:
@@ -1176,31 +1027,6 @@ definitions:
       updatedAt:
         type: string
     type: object
-  types.UpdateCallHistoryByIDRequest:
-    properties:
-      clientMachineCode:
-        type: string
-      id:
-        description: uint64 id
-        type: integer
-      instruction:
-        type: string
-      mobileNumber:
-        type: string
-      requestMachineCode:
-        type: string
-    type: object
-  types.UpdateCallHistoryByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
   types.UpdateClientsByIDRequest:
     properties:
       id:
@@ -1373,35 +1199,35 @@ info:
   title: caller api docs
   version: "2.0"
 paths:
-  /api/v1/callHistory:
+  /api/v1/callLog:
     post:
       consumes:
       - application/json
-      description: submit information to create callHistory
+      description: submit information to create callLog
       parameters:
-      - description: callHistory information
+      - description: callLog information
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/types.CreateCallHistoryRequest'
+          $ref: '#/definitions/types.CreateUnanswerdCallRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.CreateCallHistoryRespond'
+            $ref: '#/definitions/types.CreateUnanswerdCallRespond'
       security:
       - BearerAuth: []
-      summary: create callHistory
+      summary: create callLog
       tags:
-      - callHistory
-  /api/v1/callHistory/{id}:
+      - callLog
+  /api/v1/callLog/{id}:
     delete:
       consumes:
       - application/json
-      description: delete callHistory by id
+      description: delete callLog by id
       parameters:
       - description: id
         in: path
@@ -1414,16 +1240,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.DeleteCallHistoryByIDRespond'
+            $ref: '#/definitions/types.DeleteUnanswerdCallByIDRespond'
       security:
       - BearerAuth: []
-      summary: delete callHistory
+      summary: delete callLog
       tags:
-      - callHistory
+      - callLog
     get:
       consumes:
       - application/json
-      description: get callHistory detail by id
+      description: get callLog detail by id
       parameters:
       - description: id
         in: path
@@ -1436,45 +1262,45 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.GetCallHistoryByIDRespond'
+            $ref: '#/definitions/types.GetUnanswerdCallByIDRespond'
       security:
       - BearerAuth: []
-      summary: get callHistory detail
+      summary: get callLog detail
       tags:
-      - callHistory
+      - callLog
     put:
       consumes:
       - application/json
-      description: update callHistory information by id
+      description: update callLog information by id
       parameters:
       - description: id
         in: path
         name: id
         required: true
         type: string
-      - description: callHistory information
+      - description: callLog information
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/types.UpdateCallHistoryByIDRequest'
+          $ref: '#/definitions/types.UpdateUnanswerdCallByIDRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.UpdateCallHistoryByIDRespond'
+            $ref: '#/definitions/types.UpdateUnanswerdCallByIDRespond'
       security:
       - BearerAuth: []
-      summary: update callHistory
+      summary: update callLog
       tags:
-      - callHistory
-  /api/v1/callHistory/condition:
+      - callLog
+  /api/v1/callLog/condition:
     post:
       consumes:
       - application/json
-      description: get callHistory by condition
+      description: get callLog by condition
       parameters:
       - description: query condition
         in: body
@@ -1488,41 +1314,41 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.GetCallHistoryByConditionRespond'
+            $ref: '#/definitions/types.GetUnanswerdCallByConditionRespond'
       security:
       - BearerAuth: []
-      summary: get callHistory by condition
+      summary: get callLog by condition
       tags:
-      - callHistory
-  /api/v1/callHistory/delete/ids:
+      - callLog
+  /api/v1/callLog/delete/ids:
     post:
       consumes:
       - application/json
-      description: delete callHistorys by batch id
+      description: delete callLogs by batch id
       parameters:
       - description: id array
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/types.DeleteCallHistorysByIDsRequest'
+          $ref: '#/definitions/types.DeleteUnanswerdCallsByIDsRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.DeleteCallHistorysByIDsRespond'
+            $ref: '#/definitions/types.DeleteUnanswerdCallsByIDsRespond'
       security:
       - BearerAuth: []
-      summary: delete callHistorys
+      summary: delete callLogs
       tags:
-      - callHistory
-  /api/v1/callHistory/list:
+      - callLog
+  /api/v1/callLog/list:
     get:
       consumes:
       - application/json
-      description: list of callHistorys by last id and limit
+      description: list of callLogs by last id and limit
       parameters:
       - default: 0
         description: last id, default is MaxInt32
@@ -1546,16 +1372,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.ListCallHistorysRespond'
+            $ref: '#/definitions/types.ListUnanswerdCallsRespond'
       security:
       - BearerAuth: []
-      summary: list of callHistorys by last id and limit
+      summary: list of callLogs by last id and limit
       tags:
-      - callHistory
+      - callLog
     post:
       consumes:
       - application/json
-      description: list of callHistorys by paging and conditions
+      description: list of callLogs by paging and conditions
       parameters:
       - description: query parameters
         in: body
@@ -1569,36 +1395,36 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.ListCallHistorysRespond'
+            $ref: '#/definitions/types.ListUnanswerdCallsRespond'
       security:
       - BearerAuth: []
-      summary: list of callHistorys by query parameters
+      summary: list of callLogs by query parameters
       tags:
-      - callHistory
-  /api/v1/callHistory/list/ids:
+      - callLog
+  /api/v1/callLog/list/ids:
     post:
       consumes:
       - application/json
-      description: list of callHistorys by batch id
+      description: list of callLogs by batch id
       parameters:
       - description: id array
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/types.ListCallHistorysByIDsRequest'
+          $ref: '#/definitions/types.ListUnanswerdCallsByIDsRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.ListCallHistorysByIDsRespond'
+            $ref: '#/definitions/types.ListUnanswerdCallsByIDsRespond'
       security:
       - BearerAuth: []
-      summary: list of callHistorys by batch id
+      summary: list of callLogs by batch id
       tags:
-      - callHistory
+      - callLog
   /api/v1/clients:
     post:
       consumes:
@@ -2729,232 +2555,6 @@ paths:
       summary: list of smss by batch id
       tags:
       - sms
-  /api/v1/callLog:
-    post:
-      consumes:
-      - application/json
-      description: submit information to create callLog
-      parameters:
-      - description: callLog information
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.CreateUnanswerdCallRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.CreateUnanswerdCallRespond'
-      security:
-      - BearerAuth: []
-      summary: create callLog
-      tags:
-      - callLog
-  /api/v1/callLog/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: delete callLog by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteUnanswerdCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: delete callLog
-      tags:
-      - callLog
-    get:
-      consumes:
-      - application/json
-      description: get callLog detail by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetUnanswerdCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: get callLog detail
-      tags:
-      - callLog
-    put:
-      consumes:
-      - application/json
-      description: update callLog information by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: callLog information
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateUnanswerdCallByIDRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.UpdateUnanswerdCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: update callLog
-      tags:
-      - callLog
-  /api/v1/callLog/condition:
-    post:
-      consumes:
-      - application/json
-      description: get callLog by condition
-      parameters:
-      - description: query condition
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Conditions'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetUnanswerdCallByConditionRespond'
-      security:
-      - BearerAuth: []
-      summary: get callLog by condition
-      tags:
-      - callLog
-  /api/v1/callLog/delete/ids:
-    post:
-      consumes:
-      - application/json
-      description: delete callLogs by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.DeleteUnanswerdCallsByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteUnanswerdCallsByIDsRespond'
-      security:
-      - BearerAuth: []
-      summary: delete callLogs
-      tags:
-      - callLog
-  /api/v1/callLog/list:
-    get:
-      consumes:
-      - application/json
-      description: list of callLogs by last id and limit
-      parameters:
-      - default: 0
-        description: last id, default is MaxInt32
-        in: query
-        name: lastID
-        required: true
-        type: integer
-      - default: 10
-        description: size in each page
-        in: query
-        name: limit
-        type: integer
-      - default: -id
-        description: 'sort by column name of table, and the '
-        in: query
-        name: sort
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListUnanswerdCallsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of callLogs by last id and limit
-      tags:
-      - callLog
-    post:
-      consumes:
-      - application/json
-      description: list of callLogs by paging and conditions
-      parameters:
-      - description: query parameters
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Params'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListUnanswerdCallsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of callLogs by query parameters
-      tags:
-      - callLog
-  /api/v1/callLog/list/ids:
-    post:
-      consumes:
-      - application/json
-      description: list of callLogs by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.ListUnanswerdCallsByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListUnanswerdCallsByIDsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of callLogs by batch id
-      tags:
-      - callLog
   /api/v1/user:
     post:
       consumes:

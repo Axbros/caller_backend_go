@@ -286,7 +286,6 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 										queen_client, _ := w.iDao.GetQueenValue(ctx, "group_name_"+group_name)
 										if readFromClients(queen_client) != nil {
 											datetime := time.Now().Format("2006-01-02 15:04:05")
-
 											w.cDao.Create(ctx, &model.UnanswerdCall{
 												ClientMachineCode: queen_client,
 												ClientTime:        datetime,

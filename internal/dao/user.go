@@ -23,6 +23,7 @@ var _ UserDao = (*userDao)(nil)
 // UserDao defining the dao interface
 type UserDao interface {
 	Create(ctx context.Context, table *model.User) error
+	IsExist(ctx context.Context, table *model.User) uint64
 	DeleteByID(ctx context.Context, id uint64) error
 	UpdateByID(ctx context.Context, table *model.User) error
 	GetByID(ctx context.Context, id uint64) (*model.User, error)
@@ -65,14 +66,19 @@ func (d *userDao) deleteCache(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// Create a record, insert the record and the id value is written back to the table
-func (d *userDao) Create(ctx context.Context, table *model.User) error {
+func (d *userDao) IsExist(ctx context.Context, table *model.User) uint64 {
 	record := &model.User{}
 	isExist := d.db.WithContext(ctx).Where("machine_code =?", table.MachineCode).First(record)
 	if isExist.RowsAffected > 0 {
-		return errors.New("用户已存在")
+		return record.ID
 		// return response.Error(c, ecode.ErrCreateGroupClient)
+	} else {
+		return 0
 	}
+}
+
+// Create a record, insert the record and the id value is written back to the table
+func (d *userDao) Create(ctx context.Context, table *model.User) error {
 	return d.db.WithContext(ctx).Create(table).Error
 }
 

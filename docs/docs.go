@@ -15,14 +15,14 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/callHistory": {
+        "/api/v1/callLog": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "submit information to create callHistory",
+                "description": "submit information to create callLog",
                 "consumes": [
                     "application/json"
                 ],
@@ -30,17 +30,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "create callHistory",
+                "summary": "create callLog",
                 "parameters": [
                     {
-                        "description": "callHistory information",
+                        "description": "callLog information",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.CreateCallHistoryRequest"
+                            "$ref": "#/definitions/types.CreateUnanswerdCallRequest"
                         }
                     }
                 ],
@@ -48,20 +48,20 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.CreateCallHistoryRespond"
+                            "$ref": "#/definitions/types.CreateUnanswerdCallRespond"
                         }
                     }
                 }
             }
         },
-        "/api/v1/callHistory/condition": {
+        "/api/v1/callLog/condition": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "get callHistory by condition",
+                "description": "get callLog by condition",
                 "consumes": [
                     "application/json"
                 ],
@@ -69,9 +69,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "get callHistory by condition",
+                "summary": "get callLog by condition",
                 "parameters": [
                     {
                         "description": "query condition",
@@ -87,20 +87,20 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.GetCallHistoryByConditionRespond"
+                            "$ref": "#/definitions/types.GetUnanswerdCallByConditionRespond"
                         }
                     }
                 }
             }
         },
-        "/api/v1/callHistory/delete/ids": {
+        "/api/v1/callLog/delete/ids": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "delete callHistorys by batch id",
+                "description": "delete callLogs by batch id",
                 "consumes": [
                     "application/json"
                 ],
@@ -108,9 +108,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "delete callHistorys",
+                "summary": "delete callLogs",
                 "parameters": [
                     {
                         "description": "id array",
@@ -118,7 +118,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.DeleteCallHistorysByIDsRequest"
+                            "$ref": "#/definitions/types.DeleteUnanswerdCallsByIDsRequest"
                         }
                     }
                 ],
@@ -126,20 +126,20 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.DeleteCallHistorysByIDsRespond"
+                            "$ref": "#/definitions/types.DeleteUnanswerdCallsByIDsRespond"
                         }
                     }
                 }
             }
         },
-        "/api/v1/callHistory/list": {
+        "/api/v1/callLog/list": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "list of callHistorys by last id and limit",
+                "description": "list of callLogs by last id and limit",
                 "consumes": [
                     "application/json"
                 ],
@@ -147,9 +147,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "list of callHistorys by last id and limit",
+                "summary": "list of callLogs by last id and limit",
                 "parameters": [
                     {
                         "type": "integer",
@@ -178,7 +178,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.ListCallHistorysRespond"
+                            "$ref": "#/definitions/types.ListUnanswerdCallsRespond"
                         }
                     }
                 }
@@ -189,7 +189,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "list of callHistorys by paging and conditions",
+                "description": "list of callLogs by paging and conditions",
                 "consumes": [
                     "application/json"
                 ],
@@ -197,9 +197,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "list of callHistorys by query parameters",
+                "summary": "list of callLogs by query parameters",
                 "parameters": [
                     {
                         "description": "query parameters",
@@ -215,20 +215,20 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.ListCallHistorysRespond"
+                            "$ref": "#/definitions/types.ListUnanswerdCallsRespond"
                         }
                     }
                 }
             }
         },
-        "/api/v1/callHistory/list/ids": {
+        "/api/v1/callLog/list/ids": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "list of callHistorys by batch id",
+                "description": "list of callLogs by batch id",
                 "consumes": [
                     "application/json"
                 ],
@@ -236,9 +236,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "list of callHistorys by batch id",
+                "summary": "list of callLogs by batch id",
                 "parameters": [
                     {
                         "description": "id array",
@@ -246,7 +246,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.ListCallHistorysByIDsRequest"
+                            "$ref": "#/definitions/types.ListUnanswerdCallsByIDsRequest"
                         }
                     }
                 ],
@@ -254,20 +254,20 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.ListCallHistorysByIDsRespond"
+                            "$ref": "#/definitions/types.ListUnanswerdCallsByIDsRespond"
                         }
                     }
                 }
             }
         },
-        "/api/v1/callHistory/{id}": {
+        "/api/v1/callLog/{id}": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "get callHistory detail by id",
+                "description": "get callLog detail by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -275,9 +275,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "get callHistory detail",
+                "summary": "get callLog detail",
                 "parameters": [
                     {
                         "type": "string",
@@ -291,7 +291,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.GetCallHistoryByIDRespond"
+                            "$ref": "#/definitions/types.GetUnanswerdCallByIDRespond"
                         }
                     }
                 }
@@ -302,7 +302,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "update callHistory information by id",
+                "description": "update callLog information by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -310,9 +310,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "update callHistory",
+                "summary": "update callLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -322,12 +322,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "callHistory information",
+                        "description": "callLog information",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.UpdateCallHistoryByIDRequest"
+                            "$ref": "#/definitions/types.UpdateUnanswerdCallByIDRequest"
                         }
                     }
                 ],
@@ -335,7 +335,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.UpdateCallHistoryByIDRespond"
+                            "$ref": "#/definitions/types.UpdateUnanswerdCallByIDRespond"
                         }
                     }
                 }
@@ -346,7 +346,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "delete callHistory by id",
+                "description": "delete callLog by id",
                 "consumes": [
                     "application/json"
                 ],
@@ -354,9 +354,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "callHistory"
+                    "callLog"
                 ],
-                "summary": "delete callHistory",
+                "summary": "delete callLog",
                 "parameters": [
                     {
                         "type": "string",
@@ -370,7 +370,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.DeleteCallHistoryByIDRespond"
+                            "$ref": "#/definitions/types.DeleteUnanswerdCallByIDRespond"
                         }
                     }
                 }
@@ -2181,367 +2181,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/callLog": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "submit information to create callLog",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "create callLog",
-                "parameters": [
-                    {
-                        "description": "callLog information",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.CreateUnanswerdCallRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.CreateUnanswerdCallRespond"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/callLog/condition": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "get callLog by condition",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "get callLog by condition",
-                "parameters": [
-                    {
-                        "description": "query condition",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.Conditions"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.GetUnanswerdCallByConditionRespond"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/callLog/delete/ids": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "delete callLogs by batch id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "delete callLogs",
-                "parameters": [
-                    {
-                        "description": "id array",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.DeleteUnanswerdCallsByIDsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.DeleteUnanswerdCallsByIDsRespond"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/callLog/list": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "list of callLogs by last id and limit",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "list of callLogs by last id and limit",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 0,
-                        "description": "last id, default is MaxInt32",
-                        "name": "lastID",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "size in each page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "-id",
-                        "description": "sort by column name of table, and the ",
-                        "name": "sort",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.ListUnanswerdCallsRespond"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "list of callLogs by paging and conditions",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "list of callLogs by query parameters",
-                "parameters": [
-                    {
-                        "description": "query parameters",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.Params"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.ListUnanswerdCallsRespond"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/callLog/list/ids": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "list of callLogs by batch id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "list of callLogs by batch id",
-                "parameters": [
-                    {
-                        "description": "id array",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.ListUnanswerdCallsByIDsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.ListUnanswerdCallsByIDsRespond"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/callLog/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "get callLog detail by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "get callLog detail",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.GetUnanswerdCallByIDRespond"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "update callLog information by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "update callLog",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "callLog information",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/types.UpdateUnanswerdCallByIDRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.UpdateUnanswerdCallByIDRespond"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "delete callLog by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "callLog"
-                ],
-                "summary": "delete callLog",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.DeleteUnanswerdCallByIDRespond"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/user": {
             "post": {
                 "security": [
@@ -2905,33 +2544,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "types.CallHistoryObjDetail": {
-            "type": "object",
-            "properties": {
-                "clientMachineCode": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "description": "convert to string id",
-                    "type": "string"
-                },
-                "instruction": {
-                    "type": "string"
-                },
-                "mobileNumber": {
-                    "type": "string"
-                },
-                "requestMachineCode": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
         "types.ClientsObjDetail": {
             "type": "object",
             "properties": {
@@ -2985,52 +2597,9 @@ const docTemplate = `{
                 }
             }
         },
-        "types.CreateCallHistoryRequest": {
-            "type": "object",
-            "properties": {
-                "clientMachineCode": {
-                    "type": "string"
-                },
-                "instruction": {
-                    "type": "string"
-                },
-                "mobileNumber": {
-                    "type": "string"
-                },
-                "requestMachineCode": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.CreateCallHistoryRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data",
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "description": "id",
-                            "type": "integer"
-                        }
-                    }
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
         "types.CreateClientsRequest": {
             "type": "object",
             "properties": {
-                "ipAddress": {
-                    "type": "string"
-                },
                 "machineCode": {
                     "type": "string"
                 }
@@ -3176,6 +2745,9 @@ const docTemplate = `{
                 "date": {
                     "type": "string"
                 },
+                "from": {
+                    "type": "string"
+                },
                 "machineCode": {
                     "type": "string"
                 },
@@ -3265,51 +2837,6 @@ const docTemplate = `{
                             "type": "integer"
                         }
                     }
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
-        "types.DeleteCallHistoryByIDRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data"
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
-        "types.DeleteCallHistorysByIDsRequest": {
-            "type": "object",
-            "properties": {
-                "ids": {
-                    "description": "id list",
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "types.DeleteCallHistorysByIDsRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data"
                 },
                 "msg": {
                     "description": "return information description",
@@ -3650,50 +3177,6 @@ const docTemplate = `{
                 },
                 "userId": {
                     "type": "integer"
-                }
-            }
-        },
-        "types.GetCallHistoryByConditionRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data",
-                    "type": "object",
-                    "properties": {
-                        "callHistory": {
-                            "$ref": "#/definitions/types.CallHistoryObjDetail"
-                        }
-                    }
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
-        "types.GetCallHistoryByIDRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data",
-                    "type": "object",
-                    "properties": {
-                        "callHistory": {
-                            "$ref": "#/definitions/types.CallHistoryObjDetail"
-                        }
-                    }
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
                 }
             }
         },
@@ -4046,69 +3529,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.ListCallHistorysByIDsRequest": {
-            "type": "object",
-            "properties": {
-                "ids": {
-                    "description": "id list",
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "types.ListCallHistorysByIDsRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data",
-                    "type": "object",
-                    "properties": {
-                        "callHistorys": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/types.CallHistoryObjDetail"
-                            }
-                        }
-                    }
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
-        "types.ListCallHistorysRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data",
-                    "type": "object",
-                    "properties": {
-                        "callHistorys": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/types.CallHistoryObjDetail"
-                            }
-                        }
-                    }
-                },
-                "msg": {
-                    "description": "return information description",
                     "type": "string"
                 }
             }
@@ -4629,43 +4049,6 @@ const docTemplate = `{
                 }
             }
         },
-        "types.UpdateCallHistoryByIDRequest": {
-            "type": "object",
-            "properties": {
-                "clientMachineCode": {
-                    "type": "string"
-                },
-                "id": {
-                    "description": "uint64 id",
-                    "type": "integer"
-                },
-                "instruction": {
-                    "type": "string"
-                },
-                "mobileNumber": {
-                    "type": "string"
-                },
-                "requestMachineCode": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.UpdateCallHistoryByIDRespond": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "return code",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "return data"
-                },
-                "msg": {
-                    "description": "return information description",
-                    "type": "string"
-                }
-            }
-        },
         "types.UpdateClientsByIDRequest": {
             "type": "object",
             "properties": {
@@ -4931,8 +4314,7 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "http server api docs",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	// LeftDelim:        "{{",
-	// RightDelim:       "}}",
+
 }
 
 func init() {

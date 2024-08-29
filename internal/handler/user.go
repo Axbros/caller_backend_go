@@ -79,10 +79,18 @@ func (h *userHandler) Create(c *gin.Context) {
 	// Note: if copier.Copy cannot assign a value to a field, add it here
 
 	ctx := middleware.WrapCtx(c)
+	recordID := h.iDao.IsExist(ctx, user)
+	if recordID > 0 {
+		logger.Infof("record is exist", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
+		response.Success(c, gin.H{
+			"id": recordID,
+		})
+		return
+	}
 	err = h.iDao.Create(ctx, user)
 	if err != nil {
 		logger.Error("Create error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
-		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		response.Output(c, ecode.ErrCreateClients.ToHTTPCode())
 		return
 	}
 

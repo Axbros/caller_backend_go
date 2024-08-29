@@ -22,7 +22,7 @@ var _ ClientsDao = (*clientsDao)(nil)
 // ClientsDao defining the dao interface
 type ClientsDao interface {
 	Create(ctx context.Context, table *model.Clients) error
-	IsExist(ctx context.Context, table *model.Clients) (bool, int64, error)
+	IsExist(ctx context.Context, table *model.Clients) uint64
 	GetExistingRecordID(ctx context.Context, table *model.Clients) (int64, error)
 	DeleteByID(ctx context.Context, id uint64) error
 	UpdateByID(ctx context.Context, table *model.Clients) error
@@ -69,21 +69,17 @@ func (d *clientsDao) Create(ctx context.Context, table *model.Clients) error {
 	return d.db.WithContext(ctx).Create(table).Error
 }
 
-func (d *clientsDao) IsExist(ctx context.Context, table *model.Clients) (bool, int64, error) {
-	var count int64
-	query := d.db.WithContext(ctx).Model(&model.Clients{}).Where("machine_code = ?", table.MachineCode).Count(&count)
-	if query.Error != nil {
-		return false, 0, query.Error
+func (d *clientsDao) IsExist(ctx context.Context, table *model.Clients) uint64 {
+	record := &model.Clients{}
+
+	isExist := d.db.WithContext(ctx).Model(&model.Clients{}).Where("machine_code = ?", table.MachineCode).First(record)
+
+	if isExist.RowsAffected > 0 {
+		return record.ID
+	} else {
+		return 0
 	}
-	if count > 0 {
-		// 假设您有一个方法可以获取存在记录的 ID
-		id, err := d.GetExistingRecordID(ctx, table)
-		if err != nil {
-			return false, 0, err
-		}
-		return true, id, nil
-	}
-	return false, 0, nil
+
 }
 func (d *clientsDao) GetExistingRecordID(ctx context.Context, table *model.Clients) (int64, error) {
 	// 这里实现获取已存在记录的 ID 的逻辑

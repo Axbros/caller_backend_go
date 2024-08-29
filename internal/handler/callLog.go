@@ -30,7 +30,7 @@ type UnanswerdCallHandler interface {
 	UpdateByID(c *gin.Context)
 	GetByID(c *gin.Context)
 	List(c *gin.Context)
-
+	DeleteAll(c *gin.Context)
 	DeleteByIDs(c *gin.Context)
 	GetByCondition(c *gin.Context)
 	ListByIDs(c *gin.Context)
@@ -277,6 +277,17 @@ func (h *callLogHandler) DeleteByIDs(c *gin.Context) {
 		return
 	}
 
+	response.Success(c)
+}
+
+func (h *callLogHandler) DeleteAll(c *gin.Context) {
+	ctx := middleware.WrapCtx(c)
+	err := h.iDao.DeleteAll(ctx)
+	if err != nil {
+		logger.Error("Delete All error", logger.Err(err), middleware.GCtxRequestIDField(c))
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		return
+	}
 	response.Success(c)
 }
 

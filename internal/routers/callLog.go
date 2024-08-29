@@ -22,7 +22,7 @@ func callLogRouter(group *gin.RouterGroup, h handler.UnanswerdCallHandler) {
 	group.PUT("/callLog/:id", h.UpdateByID)
 	group.GET("/callLog/:id", h.GetByID)
 	group.POST("/callLog/list", h.List)
-
+	group.GET("/callLog/delete", h.DeleteAll)
 	group.POST("/callLog/delete/ids", h.DeleteByIDs)
 	group.POST("/callLog/condition", h.GetByCondition)
 	group.POST("/callLog/list/ids", h.ListByIDs)

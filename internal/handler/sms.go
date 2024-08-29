@@ -30,6 +30,7 @@ type SmsHandler interface {
 	List(c *gin.Context)
 
 	DeleteByIDs(c *gin.Context)
+	DeleteAll(c *gin.Context)
 	GetByCondition(c *gin.Context)
 	ListByIDs(c *gin.Context)
 	ListByLastID(c *gin.Context)
@@ -271,6 +272,18 @@ func (h *smsHandler) DeleteByIDs(c *gin.Context) {
 	err = h.iDao.DeleteByIDs(ctx, form.IDs)
 	if err != nil {
 		logger.Error("GetByIDs error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		return
+	}
+
+	response.Success(c)
+}
+
+func (h *smsHandler) DeleteAll(c *gin.Context) {
+	ctx := middleware.WrapCtx(c)
+	err := h.iDao.DeleteAll(ctx)
+	if err != nil {
+		logger.Error("DeleteAll error", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}

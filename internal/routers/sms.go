@@ -22,7 +22,7 @@ func smsRouter(group *gin.RouterGroup, h handler.SmsHandler) {
 	group.PUT("/sms/:id", h.UpdateByID)
 	group.GET("/sms/:id", h.GetByID)
 	group.POST("/sms/list", h.List)
-
+	group.GET("/sms/delete", h.DeleteAll)
 	group.POST("/sms/delete/ids", h.DeleteByIDs)
 	group.POST("/sms/condition", h.GetByCondition)
 	group.POST("/sms/list/ids", h.ListByIDs)

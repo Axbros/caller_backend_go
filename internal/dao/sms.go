@@ -28,6 +28,7 @@ type SmsDao interface {
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.Sms, int64, error)
 
 	DeleteByIDs(ctx context.Context, ids []uint64) error
+	DeleteAll(ctx context.Context) error
 	GetByCondition(ctx context.Context, condition *query.Conditions) (*model.Sms, error)
 	GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.Sms, error)
 	GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.Sms, error)
@@ -242,6 +243,14 @@ func (d *smsDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 		_ = d.deleteCache(ctx, id)
 	}
 
+	return nil
+}
+
+func (d *smsDao) DeleteAll(ctx context.Context) error {
+	err := d.db.WithContext(ctx).Where("id > (?)", 0).Delete(&model.Sms{}).Error
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

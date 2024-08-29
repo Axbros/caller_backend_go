@@ -29,6 +29,7 @@ type UnanswerdCallDao interface {
 	GetByColumns(ctx context.Context, params *query.Params) ([]*model.UnanswerdCall, int64, error)
 
 	DeleteByIDs(ctx context.Context, ids []uint64) error
+	DeleteAll(ctx context.Context) error
 	GetByCondition(ctx context.Context, condition *query.Conditions) ([]*model.UnanswerdCall, error)
 	GetByIDs(ctx context.Context, ids []uint64) (map[uint64]*model.UnanswerdCall, error)
 	GetByLastID(ctx context.Context, lastID uint64, limit int, sort string) ([]*model.UnanswerdCall, error)
@@ -257,6 +258,14 @@ func (d *callLogDao) DeleteByIDs(ctx context.Context, ids []uint64) error {
 		_ = d.deleteCache(ctx, id)
 	}
 
+	return nil
+}
+
+func (d *callLogDao) DeleteAll(ctx context.Context) error {
+	err := d.db.WithContext(ctx).Where("id > (?)", 0).Delete(&model.UnanswerdCall{}).Error
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

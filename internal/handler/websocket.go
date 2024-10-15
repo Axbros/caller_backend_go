@@ -7,6 +7,7 @@ import (
 	"caller/internal/utils"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"sync"
@@ -346,8 +347,8 @@ func (w websocketHandler) GetOnlineClients(c *gin.Context) {
 // }
 
 func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
-	logger.Info("websocket", logger.String("send to", conn.RemoteAddr().String()), logger.String("message", string(message)))
 	if conn != nil {
+		logger.Info("websocket", logger.String("send to", conn.RemoteAddr().String()), logger.String("message", string(message)))
 		err := conn.WriteMessage(websocket.TextMessage, message)
 		if err != nil {
 			logger.Error("向客户端发送数据出错", logger.Err(err), logger.String("message", string(message)), logger.String("to", conn.RemoteAddr().String()))
@@ -358,6 +359,7 @@ func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
 		}
 	} else {
 		logger.Error("接收设备不在线:" + conn.RemoteAddr().String())
+		return errors.New("device received is offline,the message has been abort" + string(message))
 	}
 	time.Sleep(500 * time.Millisecond)
 	return nil

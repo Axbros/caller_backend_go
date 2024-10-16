@@ -23,16 +23,17 @@ import (
 
 var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
+var ip2deviceID = make(map[string]string)
 
 func updateClients(key string, value *websocket.Conn) {
 	logger.Info("检测到设备加入", logger.Any("设备ID", key))
+	ip2deviceID[value.RemoteAddr().String()] = key
 	rwMu.Lock()
 	clients[key] = value
 	rwMu.Unlock()
 }
 
 func readFromClients(key string) *websocket.Conn {
-	rwMu.RLock()
 	value := clients[key]
 	rwMu.RUnlock()
 	return value
@@ -77,13 +78,11 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		remoteAddr := conn.RemoteAddr().String()
 		if err != nil {
 			logger.Info("检测到设备断开连接", logger.Any("设备IP", remoteAddr))
-			for key, value := range clients {
-				if remoteAddr == value.RemoteAddr().String() {
-					deleteClient(key)
-					logger.Info("已移除设备", logger.Any("设备ID", key), logger.Any("剩余设备数量", len(clients)))
-				}
-			}
-			return
+			offlineDeviceId := ip2deviceID[remoteAddr]
+			delete(ip2deviceID, remoteAddr)
+			deleteClient(offlineDeviceId)
+			logger.Info("已移除设备", logger.Any("设备ID", offlineDeviceId), logger.Any("value", conn.RemoteAddr().String()), logger.Any("remoteAddr", remoteAddr), logger.Any("剩余设备数量", len(clients)))
+			continue
 		}
 
 		// 将字节切片转换为字符串
@@ -93,7 +92,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 
 		if err != nil {
 			logger.Error("ParseTextToJSON error", logger.Err(err), logger.String("origin message is", messageStr))
-			return
+			continue
 		}
 		// 类型断言判断是否为 map[string]interface{} 类型
 		dataMap, ok := jsonData.(map[string]interface{})
@@ -249,7 +248,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
 							// //user excute endcall or answer should put the client machine code id to message,data is user machine code id
 							sendDataToSpecificClient(readFromClients(messageStr), jsonStr)
-							return
+							continue
 						}
 						if eventStr == "call" {
 							to := dataMap["to"].(string)

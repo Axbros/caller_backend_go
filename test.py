@@ -32,7 +32,7 @@ def send_heartbeat(url, data):
 
 # 创建并启动线程来发送心跳请求
 threads = []
-for i in range(30):
+for i in range(100):
     thread = threading.Thread(target=send_heartbeat, args=(websocket_url, i))
     threads.append(thread)
     thread.start()

@@ -25,24 +25,25 @@ var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
 var ip2deviceID = make(map[string]string)
 
+func deleteClient(key string) {
+	rwMu.Lock()
+	delete(clients, key)
+	rwMu.Unlock() // 添加Unlock来释放锁
+}
+
+func readFromClients(key string) *websocket.Conn {
+	rwMu.RLock()
+	defer rwMu.RUnlock() // 使用defer确保锁被释放
+	value := clients[key]
+	return value
+}
+
 func updateClients(key string, value *websocket.Conn) {
 	logger.Info("检测到设备加入", logger.Any("设备ID", key))
 	ip2deviceID[value.RemoteAddr().String()] = key
 	rwMu.Lock()
 	clients[key] = value
-	rwMu.Unlock()
-}
-
-func readFromClients(key string) *websocket.Conn {
-	value := clients[key]
-	rwMu.RUnlock()
-	return value
-}
-
-func deleteClient(key string) {
-	rwMu.Lock()
-	delete(clients, key)
-	rwMu.Unlock()
+	rwMu.Unlock() // 确保在记录日志前释放锁
 }
 
 type WebsocketHandler interface {
@@ -346,21 +347,10 @@ func (w websocketHandler) GetOnlineClients(c *gin.Context) {
 // }
 
 func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
-	if conn != nil {
-		logger.Info("websocket", logger.String("send to", conn.RemoteAddr().String()), logger.String("message", string(message)))
-		err := conn.WriteMessage(websocket.TextMessage, message)
-		if err != nil {
-			logger.Error("向客户端发送数据出错", logger.Err(err), logger.String("message", string(message)), logger.String("to", conn.RemoteAddr().String()))
-			err := conn.Close()
-			if err != nil {
-				return err
-			}
-		}
-	} else {
-		logger.Error("接收设备不在线")
-		return errors.New("device received is offline,the message has been abort" + string(message))
+	if err := writeMessageWithLogging(conn, websocket.TextMessage, message); err != nil {
+		return err
 	}
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond) // 暂停一段时间，可能为了防止消息发送过快
 	return nil
 }
 
@@ -373,4 +363,19 @@ func generateStandardWebsocketMsg(event, message, data, key string) []byte {
 
 	msg := fmt.Sprintf(`{"event":"%s","message":"%s","data":"%s","key":"%s","type":"server"}`, event, message, data, key)
 	return []byte(msg)
+}
+func writeMessageWithLogging(conn *ws.Conn, messageType int, message []byte) error {
+	if conn != nil {
+		err := conn.WriteMessage(messageType, message)
+		if err != nil {
+			logger.Error("向客户端发送数据出错", logger.Err(err), logger.String("message", string(message)), logger.String("to", conn.RemoteAddr().String()))
+			// 尝试关闭连接，忽略关闭连接时可能出现的错误
+			_ = conn.Close()
+			return err
+		}
+	} else {
+		logger.Error("接收设备不在线")
+		return errors.New("device received is offline, the message has been aborted")
+	}
+	return nil
 }

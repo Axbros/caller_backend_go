@@ -358,7 +358,7 @@ func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
 			}
 		}
 	} else {
-		logger.Error("接收设备不在线:" + conn.RemoteAddr().String())
+		logger.Error("接收设备不在线")
 		return errors.New("device received is offline,the message has been abort" + string(message))
 	}
 	time.Sleep(500 * time.Millisecond)

@@ -422,11 +422,14 @@ func (h *groupClientHandler) UpdateRedis(c *gin.Context) {
 		response.Error(c, ecode.ErrUpdateRedis, err)
 		return
 	}
+	var result []interface{}
+
 	for _, model := range all_records {
+		result = append(result, "group_name_"+model.GroupName)
 		redisDao.PushClient2GroupName(c, "group_name_", model.GroupName, model.ClientID)
 	}
 	response.Success(c, gin.H{
-		"redis": "ok",
+		"total": len(result),
 	})
 
 }

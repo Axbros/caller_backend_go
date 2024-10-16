@@ -33,6 +33,7 @@ type GroupClientHandler interface {
 	GetByCondition(c *gin.Context)
 	ListByIDs(c *gin.Context)
 	ListByLastID(c *gin.Context)
+	UpdateRedis(c *gin.Context)
 }
 
 type groupClientHandler struct {
@@ -407,7 +408,28 @@ func (h *groupClientHandler) ListByLastID(c *gin.Context) {
 		"groupClients": data,
 	})
 }
+func (h *groupClientHandler) UpdateRedis(c *gin.Context) {
+	redisDao := dao.NewRedisDao(model.GetRedisCli())
+	all_records, err := h.iDao.GetGroupNameAndClientIDs(c)
+	if err != nil {
+		logger.Warn("GetGroupNameAndClientIDs error: ", middleware.GCtxRequestIDField(c))
+		response.Error(c, ecode.ErrUpdateRedis, err)
+		return
+	}
+	err = redisDao.DeleteRedisKeysWithPrefix(c, "group_name_")
+	if err != nil {
+		logger.Warn("DeleteRedisKeysWithPrefix error: ", logger.Any("err", err), middleware.GCtxRequestIDField(c))
+		response.Error(c, ecode.ErrUpdateRedis, err)
+		return
+	}
+	for _, model := range all_records {
+		redisDao.PushClient2GroupName(c, "group_name_", model.GroupName, model.ClientID)
+	}
+	response.Success(c, gin.H{
+		"redis": "ok",
+	})
 
+}
 func getGroupClientIDFromPath(c *gin.Context) (string, uint64, bool) {
 	idStr := c.Param("id")
 	id, err := utils.StrToUint64E(idStr)

@@ -26,4 +26,6 @@ func groupClientRouter(group *gin.RouterGroup, h handler.GroupClientHandler) {
 	group.POST("/groupClient/condition", h.GetByCondition)
 	group.POST("/groupClient/list/ids", h.ListByIDs)
 	group.GET("/groupClient/list", h.ListByLastID)
+
+	group.GET("/groupClient/updateRedis", h.UpdateRedis)
 }

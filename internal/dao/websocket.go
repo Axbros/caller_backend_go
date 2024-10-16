@@ -24,6 +24,9 @@ type RedisDao interface {
 	GetKey(ctx context.Context, key string) (string, error)
 	DeleteKey(ctx context.Context, key string) error
 	GetQueenValue(ctx context.Context, key string) (string, error)
+
+	PushClient2GroupName(ctx context.Context, prefix string, groupName string, clientID int) error
+	DeleteRedisKeysWithPrefix(ctx context.Context, prefix string) error
 }
 
 type redisDao struct {
@@ -48,6 +51,35 @@ func NewRedisDao(client *redis.Client) RedisDao {
 //		}
 //		return nil
 //	}
+
+func (r *redisDao) PushClient2GroupName(ctx context.Context, prefix string, groupName string, clientID int) error {
+	key := prefix + groupName
+	return r.client.RPush(ctx, key, clientID).Err()
+}
+func (r *redisDao) DeleteRedisKeysWithPrefix(ctx context.Context, prefix string) error {
+	// 获取所有以指定前缀开头的键
+	keys, err := r.client.Keys(ctx, prefix+"*").Result()
+	if err != nil {
+		return errors.New("获取键列表失败:" + err.Error())
+	}
+
+	// 遍历键并判断类型，若为列表则删除
+	for _, key := range keys {
+		keyType, err := r.client.Type(ctx, key).Result()
+		if err != nil {
+			fmt.Println("获取键类型失败：", err)
+
+			continue
+		}
+		if keyType == "list" {
+			err = r.client.Del(ctx, key).Err()
+			if err != nil {
+				return errors.New("删除键失败" + err.Error())
+			}
+		}
+	}
+	return nil
+}
 func (r *redisDao) GetIPAddrByMachineCodeFromWebsocketConnections(ctx context.Context, key string) (string, error) {
 	value, err := r.client.HGet(ctx, "websocket_connections", key).Result()
 	if err == redis.Nil {

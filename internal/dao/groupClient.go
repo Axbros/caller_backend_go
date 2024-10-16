@@ -35,6 +35,8 @@ type GroupClientDao interface {
 	CreateByTx(ctx context.Context, tx *gorm.DB, table *model.GroupClient) (uint64, error)
 	DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.GroupClient) error
+
+	GetGroupNameAndClientIDs(ctx context.Context) ([]*model.GroupClient, error)
 }
 
 type groupClientDao struct {
@@ -60,6 +62,12 @@ func (d *groupClientDao) deleteCache(ctx context.Context, id uint64) error {
 		return d.cache.Del(ctx, id)
 	}
 	return nil
+}
+
+func (d *groupClientDao) GetGroupNameAndClientIDs(ctx context.Context) ([]*model.GroupClient, error) {
+	var result []*model.GroupClient
+	err := d.db.WithContext(ctx).Find(&result).Error
+	return result, err
 }
 
 // Create a record, insert the record and the id value is written back to the table

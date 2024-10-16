@@ -21,6 +21,7 @@ var (
 	ErrGetByConditionGroupClient = errcode.NewError(groupClientBaseCode+7, "failed to get "+groupClientName+" details by conditions")
 	ErrListByIDsGroupClient      = errcode.NewError(groupClientBaseCode+8, "failed to list by batch ids "+groupClientName)
 	ErrListByLastIDGroupClient   = errcode.NewError(groupClientBaseCode+9, "failed to list by last id "+groupClientName)
+	ErrUpdateRedis               = errcode.NewError(groupClientBaseCode+10, "failed to ErrUpdateRedis "+groupClientName)
 
 	// error codes are globally unique, adding 1 to the previous error code
 )

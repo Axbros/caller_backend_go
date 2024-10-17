@@ -74,16 +74,22 @@ func NewWebsocketHandler() WebsocketHandler {
 
 func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
 
+	defer conn.Close()
+	remoteAddr := conn.RemoteAddr().String()
+	// 注册关闭事件处理函数
+	conn.SetCloseHandler(func(code int, text string) error {
+		offlineDeviceId := ip2deviceID[remoteAddr]
+		delete(ip2deviceID, remoteAddr)
+		deleteClient(offlineDeviceId)
+		logger.Info("WebSocket客户端断开连接", logger.Any("code", code), logger.Any("reason", text), logger.Any("还剩设备:", len(clients)))
+		return nil
+	})
+
 	for {
 		_, message, err := conn.ReadMessage()
-		remoteAddr := conn.RemoteAddr().String()
 		if err != nil {
-			logger.Info("检测到设备断开连接", logger.Any("设备IP", remoteAddr))
-			offlineDeviceId := ip2deviceID[remoteAddr]
-			delete(ip2deviceID, remoteAddr)
-			deleteClient(offlineDeviceId)
-			logger.Info("已移除设备", logger.Any("设备ID", offlineDeviceId), logger.Any("value", conn.RemoteAddr().String()), logger.Any("remoteAddr", remoteAddr), logger.Any("剩余设备数量", len(clients)))
-			continue
+			logger.Info("读取WebSocket消息出错", logger.Any("err", err))
+			return
 		}
 
 		// 将字节切片转换为字符串

@@ -21,6 +21,7 @@ def send_heartbeat(url, data):
         }
         # 发送消息
         ws.send(json.dumps(message))
+        ws.close()
         # 接收服务器响应（如果有的话）
         response = ws.recv()
         print(f"Received message from server for data {data}: " + response)
@@ -28,11 +29,12 @@ def send_heartbeat(url, data):
         print(f"Error sending heartbeat for data {data}: {e}")
     finally:
         # 关闭连接
-        ws.close()
+        print("关闭")
+        
 
 # 创建并启动线程来发送心跳请求
 threads = []
-for i in range(100):
+for i in range(1):
     thread = threading.Thread(target=send_heartbeat, args=(websocket_url, i))
     threads.append(thread)
     thread.start()

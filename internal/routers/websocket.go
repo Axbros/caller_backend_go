@@ -18,11 +18,14 @@ func init() {
 func websocketRouter(group *gin.RouterGroup, h handler.WebsocketHandler) {
 
 	group.GET("/", func(c *gin.Context) {
-		s := ws.NewServer(c.Writer, c.Request, h.LoopReceiveMessage) // default setting
-		err := s.Run(context.Background())
-		if err != nil {
-			log.Println("webSocket server error:", err)
-		}
+		go func() {
+			s := ws.NewServer(c.Writer, c.Request, h.LoopReceiveMessage) // default setting
+			err := s.Run(context.Background())
+			if err != nil {
+				log.Println("webSocket server error:", err)
+
+			}
+		}()
 	})
 	group.GET("/online", h.GetOnlineClients)
 }

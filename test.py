@@ -3,7 +3,7 @@ import json
 import threading
 
 # WebSocket服务器地址
-websocket_url = "ws://127.0.0.1:8080/ws/"
+websocket_url = "ws://127.0.0.1:8080/ws"
 
 # 发送单个心跳请求的函数
 def send_heartbeat(url, data):
@@ -21,7 +21,7 @@ def send_heartbeat(url, data):
         }
         # 发送消息
         ws.send(json.dumps(message))
-        ws.close()
+        # ws.close()
         # 接收服务器响应（如果有的话）
         response = ws.recv()
         print(f"Received message from server for data {data}: " + response)

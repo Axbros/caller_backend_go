@@ -32,10 +32,12 @@ func (s *httpServer) Start() error {
 			return err
 		}
 	}
-
 	if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return fmt.Errorf("listen server error: %v", err)
 	}
+	// if err := s.server.ListenAndServeTLS("/www/wwwroot/cert/fullchain.pem", "/www/wwwroot/cert/privkey.key"); err != nil && err != http.ErrServerClosed {
+	// 	return fmt.Errorf("listen server error: %v", err)
+	// }
 	return nil
 }
 

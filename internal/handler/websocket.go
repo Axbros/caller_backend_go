@@ -194,12 +194,10 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 									if readFromClients(queen_client) != nil {
 										sendDataToSpecificClient(readFromClients(strconv.Itoa(distribution_record.UserID)), generateServerWebsocketMsg("您的话机组名为：【"+groupcall_record.GroupName+"】已从队列取出话机："+queen_client+"即将呼出目标号码", messageKey))
 										targetMachine = readFromClients(queen_client)
-										datetime := time.Now().Format("2006-01-02 15:04:05")
 										w.cDao.Create(ctx, &model.UnanswerdCall{
-											ClientMachineCode: queen_client,
-											ClientTime:        datetime,
-											MobileNumber:      message,
-											Type:              "keypad",
+											MachineId:    queen_client,
+											MobileNumber: message,
+											Type:         "keypad",
 										},
 										)
 
@@ -292,12 +290,10 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 									for i := 0; i < len(clients); i++ {
 										queen_client, _ := w.iDao.GetQueenValue(ctx, "group_name_"+group_name)
 										if readFromClients(queen_client) != nil {
-											datetime := time.Now().Format("2006-01-02 15:04:05")
 											w.cDao.Create(ctx, &model.UnanswerdCall{
-												ClientMachineCode: queen_client,
-												ClientTime:        datetime,
-												MobileNumber:      messageStr,
-												Type:              "keypad",
+												MachineId:    queen_client,
+												MobileNumber: messageStr,
+												Type:         "keypad",
 											},
 											)
 											sendDataToSpecificClient(readFromClients(queen_client), generateStandardWebsocketMsg("call", messageStr, "", messageKey))

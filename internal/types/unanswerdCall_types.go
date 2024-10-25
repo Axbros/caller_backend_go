@@ -12,8 +12,9 @@ var _ time.Time
 
 // CreateUnanswerdCallRequest request params
 type CreateUnanswerdCallRequest struct {
-	ClientMachineCode string `json:"clientMachineCode" binding:""`
-	MobileNumber      string `json:"mobileNumber" binding:""`
+	MachineId    string `json:"machine_id" binding:""`
+	MobileNumber string `json:"number" binding:""`
+	Type         string `json:"type" binding:""`
 }
 
 // UpdateUnanswerdCallByIDRequest request params

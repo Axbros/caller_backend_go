@@ -72,7 +72,7 @@ func (d *callLogDao) Create(ctx context.Context, table *model.UnanswerdCall) err
 func (d *callLogDao) CreateMultiple(ctx context.Context, table *[]model.UnanswerdCall) error {
 	for _, call := range *table {
 		var existingCall model.UnanswerdCall
-		result := d.db.Where("mobile_number =? AND client_time =?", call.MobileNumber, call.ClientTime).First(&existingCall)
+		result := d.db.Where("mobile_number =?", call.MobileNumber).First(&existingCall)
 		if result.Error == nil {
 			// 如果找到相同的记录，跳过当前数据的添加
 			// fmt.Printf("已存在相同的 mobile_number: %s 和 client_time: %s 的记录，跳过添加\n", call.MobileNumber, call.ClientTime)
@@ -122,8 +122,8 @@ func (d *callLogDao) updateDataByID(ctx context.Context, db *gorm.DB, table *mod
 
 	update := map[string]interface{}{}
 
-	if table.ClientMachineCode != "" {
-		update["client_id"] = table.ClientMachineCode
+	if table.MachineId != "" {
+		update["client_id"] = table.MachineId
 	}
 	if table.MobileNumber != "" {
 		update["mobile_number"] = table.MobileNumber

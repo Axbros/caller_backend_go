@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"math"
 
 	"github.com/gin-gonic/gin"
@@ -71,7 +70,6 @@ func NewUnanswerdCallHandler() UnanswerdCallHandler {
 func (h *callLogHandler) Create(c *gin.Context) {
 	form := &types.CreateUnanswerdCallRequest{}
 	err := c.ShouldBindJSON(form)
-	fmt.Println(form)
 	if err != nil {
 		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
 		response.Error(c, ecode.InvalidParams)
@@ -87,7 +85,6 @@ func (h *callLogHandler) Create(c *gin.Context) {
 	// Note: if copier.Copy cannot assign a value to a field, add it here
 
 	ctx := middleware.WrapCtx(c)
-	fmt.Println(callLog)
 	err = h.iDao.Create(ctx, callLog)
 	if err != nil {
 		logger.Error("Create error", logger.Err(err), logger.Any("form", form), middleware.GCtxRequestIDField(c))

@@ -9,6 +9,7 @@ type UnanswerdCall struct {
 
 	MachineId    string `gorm:"column:client_id;type:varchar(32)" json:"clientMachineCode"`
 	MobileNumber string `gorm:"column:mobile_number;type:varchar(11)" json:"mobileNumber"`
+	Location     string `gorm:"column:location;type:varchar(32)" json:"location"`
 	Type         string `gorm:"column:type;type:varchar(12)" json:"type"`
 }
 

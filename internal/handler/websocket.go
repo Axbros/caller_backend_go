@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"strconv"
 	"sync"
 	"time"
@@ -123,25 +124,28 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 					if userTypeStr == "client" { //处理客户端的消息
 
 						if eventStr == "income" || eventStr == "endcall" || eventStr == "connected" || eventStr == "call_done" {
+
 							parent, err := w.uDao.GetUserByClientMachineCode(ctx, dataStr)
 							if err != nil {
 								logger.Error("GetUserByClientMachineCode error", logger.Err(err))
 							}
 							//无论话机是否绑定甲方都将数据存储在redis种
-							dataMap["from"] = remoteAddr
+							// dataMap["from"] = remoteAddr
 							parentIdStr := strconv.FormatUint(parent.ID, 10)
 							if parent.ID > 0 {
 								dataMap["to"] = parentIdStr
-								//把指令放在redis存储 当receive方收到之后执行Delete操作
-								// redisStoreKey := parentIdStr + ":" + dataMap["key"].(string)
-								// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
-								// if err != nil {
-								// 	logger.Error("存储指令到redis种失败", logger.Err(err))
-								// 	return
-								// }
 								parentConn := readFromClients(parentIdStr)
 
 								sendDataToSpecificClient(parentConn, jsonStr)
+								if eventStr == "income" {
+
+									w.cDao.Create(ctx, &model.UnanswerdCall{
+										MachineId:    dataStr,
+										MobileNumber: dataMap["message"].(string),
+										Location:     url.QueryEscape(dataMap["from"].(string)),
+										Type:         "income",
+									})
+								}
 								logger.Info("websocket", logger.String("send message", messageStr), logger.String("receive address", parentConn.RemoteAddr().String()))
 							} else {
 								err := conn.WriteMessage(websocket.TextMessage, []byte("当前没有在线的甲方设备,甲方ID："+parentIdStr))
@@ -197,10 +201,10 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 										w.cDao.Create(ctx, &model.UnanswerdCall{
 											MachineId:    queen_client,
 											MobileNumber: message,
+											Location:     "中国·大陆(拨打电话归属地暂未获得)",
 											Type:         "keypad",
 										},
 										)
-
 										break
 									} else {
 										sendDataToSpecificClient(readFromClients(strconv.Itoa(distribution_record.UserID)), generateServerWebsocketMsg("队列话机不在线，话机ID："+queen_client+"即将队列循环到下一个话机", messageKey))
@@ -253,6 +257,13 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
 							// //user excute endcall or answer should put the client machine code id to message,data is user machine code id
 							sendDataToSpecificClient(readFromClients(messageStr), jsonStr)
+							// locationStr := dataMap["from"].(string)
+							w.cDao.Create(ctx, &model.UnanswerdCall{
+								MachineId:    dataStr,
+								MobileNumber: dataMap["message"].(string),
+								Location:     url.QueryEscape(dataMap["from"].(string)),
+								Type:         "answer",
+							})
 							continue
 						}
 						if eventStr == "call" {

@@ -14,6 +14,7 @@ var _ time.Time
 type CreateUnanswerdCallRequest struct {
 	MachineId    string `json:"machine_id" binding:""`
 	MobileNumber string `json:"number" binding:""`
+	Location     string `json:"location" binding:""`
 	Type         string `json:"type" binding:""`
 }
 

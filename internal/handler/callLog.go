@@ -428,24 +428,38 @@ func (h *callLogHandler) ListByLastID(c *gin.Context) {
 }
 func (h *callLogHandler) GetByUserID(c *gin.Context) {
 	callLogType := c.Query("type")
+
 	userID, _, _ := getUnanswerdCallIDFromPath(c)
 	children, _ := h.iDao.GetChildrenByUserID(c, userID)
 	res := []*model.UnanswerdCall{}
+	var records []*model.UnanswerdCall
 	var childrenList []int
 	for i := 0; i < len(children); i++ {
 		childrenList = append(childrenList, children[i].ClientID)
-		records, _ := h.iDao.GetByCondition(c, &query.Conditions{
-			Columns: []query.Column{
-				{
-					Name:  "client_id",
-					Value: children[i].ClientID,
+		if callLogType == "keypad" {
+			records, _ = h.iDao.GetByCondition(c, &query.Conditions{
+				Columns: []query.Column{
+					{
+						Name:  "client_id",
+						Value: children[i].ClientID,
+					},
 				},
-				{
-					Name:  "type",
-					Value: callLogType,
+			})
+		} else {
+			records, _ = h.iDao.GetByCondition(c, &query.Conditions{
+				Columns: []query.Column{
+					{
+						Name:  "client_id",
+						Value: children[i].ClientID,
+					},
+					{
+						Name:  "type",
+						Value: callLogType,
+					},
 				},
-			},
-		})
+			})
+		}
+
 		for _, record := range records {
 			res = append(res, record)
 		}

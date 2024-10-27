@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/url"
 	"strconv"
 	"sync"
 	"time"
@@ -138,11 +137,10 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 
 								sendDataToSpecificClient(parentConn, jsonStr)
 								if eventStr == "income" {
-
 									w.cDao.Create(ctx, &model.UnanswerdCall{
 										MachineId:    dataStr,
 										MobileNumber: dataMap["message"].(string),
-										Location:     url.QueryEscape(dataMap["from"].(string)),
+										Location:     dataMap["from"].(string),
 										Type:         "income",
 									})
 								}
@@ -201,7 +199,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 										w.cDao.Create(ctx, &model.UnanswerdCall{
 											MachineId:    queen_client,
 											MobileNumber: message,
-											Location:     "中国·大陆(拨打电话归属地暂未获得)",
+											Location:     "中国·大陆",
 											Type:         "keypad",
 										},
 										)
@@ -261,7 +259,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							w.cDao.Create(ctx, &model.UnanswerdCall{
 								MachineId:    dataStr,
 								MobileNumber: dataMap["message"].(string),
-								Location:     url.QueryEscape(dataMap["from"].(string)),
+								Location:     dataMap["from"].(string),
 								Type:         "answer",
 							})
 							continue

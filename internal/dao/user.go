@@ -419,6 +419,18 @@ func (d *userDao) GetUserByClientMachineCode(ctx context.Context, clientId strin
 }
 
 func (d *userDao) GetUserIdByUserMachineCode(ctx context.Context, machine_code string) (*model.User, error) {
+	var count int64
+	d.db.WithContext(ctx).Table("user").Where("user.machine_code = ?", machine_code).Count(&count)
+	if count == 0 {
+		//create user
+		err := d.Create(ctx, &model.User{
+			MachineCode: machine_code,
+			Sms:         "0",
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
 	var record *model.User
 	err := d.db.WithContext(ctx).Table("user").Where("user.machine_code = ?", machine_code).Select("user.*").Find(&record).Error
 	if err != nil {

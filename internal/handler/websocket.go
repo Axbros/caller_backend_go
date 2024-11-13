@@ -262,7 +262,6 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 								Location:     dataMap["from"].(string),
 								Type:         "answer",
 							})
-							continue
 						}
 						if eventStr == "call" {
 							to := dataMap["to"].(string)

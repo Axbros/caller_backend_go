@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/app"
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
+	"caller/internal/config"
 	"caller/internal/routers"
 )
 
@@ -32,12 +32,16 @@ func (s *httpServer) Start() error {
 			return err
 		}
 	}
-	// if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	public := config.Get().SSL.Public
+	private := config.Get().SSL.Private
+	if len(public) > 0 && len(private) > 0 {
+		s.server.ListenAndServeTLS(public, private)
+	} else {
+		s.server.ListenAndServe()
+	}
+	// if err := s.server.ListenAndServeTLS("/www/wwwroot/cert/fullchain.pem", "/www/wwwroot/cert/privkey.key"); err != nil && err != http.ErrServerClosed {
 	// 	return fmt.Errorf("listen server error: %v", err)
 	// }
-	if err := s.server.ListenAndServeTLS("/www/wwwroot/cert/fullchain.pem", "/www/wwwroot/cert/privkey.key"); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("listen server error: %v", err)
-	}
 	return nil
 }
 

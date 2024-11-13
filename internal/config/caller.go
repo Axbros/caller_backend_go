@@ -40,6 +40,7 @@ type Config struct {
 	Logger     Logger       `yaml:"logger" json:"logger"`
 	NacosRd    NacosRd      `yaml:"nacosRd" json:"nacosRd"`
 	Redis      Redis        `yaml:"redis" json:"redis"`
+	SSL        SSL          `yaml:"ssl" json:"ssl"`
 }
 
 type Consul struct {
@@ -170,4 +171,9 @@ type NacosRd struct {
 type HTTP struct {
 	Port    int `yaml:"port" json:"port"`
 	Timeout int `yaml:"timeout" json:"timeout"`
+}
+
+type SSL struct {
+	Public  string `yaml:"public" json:"public"`
+	Private string `yaml:"private" json:"private"`
 }

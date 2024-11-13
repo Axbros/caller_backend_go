@@ -37,7 +37,7 @@ func (s *httpServer) Start() error {
 	public := cfg.SSL.Public
 	private := cfg.SSL.Private
 	if len(public) > 0 && len(private) > 0 {
-		if err := s.server.ListenAndServeTLS("/www/wwwroot/cert/fullchain.pem", "/www/wwwroot/cert/privkey.key"); err != nil && err != http.ErrServerClosed {
+		if err := s.server.ListenAndServeTLS(public, private); err != nil && err != http.ErrServerClosed {
 			return fmt.Errorf("listen server error: %v", err)
 		}
 	} else {

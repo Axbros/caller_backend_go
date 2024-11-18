@@ -89,7 +89,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		_, message, err := conn.ReadMessage()
 		if err != nil {
 			logger.Info("读取WebSocket消息出错", logger.Any("err", err))
-			return
+
 		}
 
 		// 将字节切片转换为字符串

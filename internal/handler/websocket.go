@@ -21,6 +21,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/ws"
 )
 
+var HEARTBEAT_TIME float64 = 10
 var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
 var ip2deviceID = make(map[string]string)
@@ -82,7 +83,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 
 	defer conn.Close()
 	remoteAddr := conn.RemoteAddr().String()
-	firstHeartbeatTime := time.Time{} // 初始化首次收到心跳的时间为零值（即时间零点）
+	lastHeartbeatTime := time.Time{} // 初始化上一次收到心跳的时间为零值
 	// 注册关闭事件处理函数
 	conn.SetCloseHandler(func(code int, text string) error {
 		closeConn(remoteAddr)
@@ -121,14 +122,14 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 					// toMachineIDStr:=dataMap["to"].(string)
 					if eventStr == "heartbeat" {
 						currentTime := time.Now()
-						if firstHeartbeatTime.IsZero() {
+						if lastHeartbeatTime.IsZero() {
 							// 如果是首次收到心跳消息，记录当前时间
-							firstHeartbeatTime = currentTime
+							lastHeartbeatTime = currentTime
 							logger.Info("首次收到心跳")
 						} else {
 							// 计算距离首次收到心跳的时间间隔
-							duration := currentTime.Sub(firstHeartbeatTime)
-							if duration.Seconds() > 60 {
+							duration := currentTime.Sub(lastHeartbeatTime)
+							if duration.Seconds() > HEARTBEAT_TIME {
 								logger.Info("等待设备发送心跳超时，主动断开")
 								closeConn(remoteAddr)
 								// 时间间隔大于10秒，断开连接
@@ -138,7 +139,9 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							}
 						}
 						// clients[dataStr] = conn
-						logger.Info("收到心跳包", logger.Any("设备ID", dataStr), logger.Any("地址", remoteAddr))
+						// 更新上一次收到心跳的时间为当前时间
+						lastHeartbeatTime = currentTime
+						logger.Info("收到心跳包", logger.Any("设备ID", dataStr), logger.Any("地址", remoteAddr), logger.Any("当前时间", currentTime))
 						updateClients(dataStr, conn)
 						// reply client that the sever has recieve the message
 						sendDataToSpecificClient(conn, generateServerWebsocketMsg("I am sever,I have recived your message", "hi"))

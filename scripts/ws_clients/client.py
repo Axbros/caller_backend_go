@@ -21,13 +21,15 @@ def send_heartbeat(url):
             }
             # 发送消息
             ws.send(json.dumps(message))
-            time.sleep(12)
+            
             try:
                 response = ws.recv()
                 print(f"Received message from server: {response}")
             except websocket.WebSocketConnectionClosedException:
                 print("Connection closed by server.")
                 break
+            time.sleep(8)
+            print("开心下一轮心跳")
     except Exception as e:
         print(f"Error sending heartbeat: {e}")
 

@@ -29,6 +29,7 @@ func deleteClient(key string) {
 	rwMu.Lock()
 	delete(clients, key)
 	rwMu.Unlock() // 添加Unlock来释放锁
+	logger.Info("删除设备", logger.Any("设备ID", key))
 }
 
 func readFromClients(key string) *websocket.Conn {
@@ -81,15 +82,15 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		offlineDeviceId := ip2deviceID[remoteAddr]
 		delete(ip2deviceID, remoteAddr)
 		deleteClient(offlineDeviceId)
-		logger.Info("WebSocket客户端断开连接", logger.Any("code", code), logger.Any("reason", text), logger.Any("还剩设备:", len(clients)))
+		logger.Info("WebSocket客户端断开连接", logger.Any("掉线设备", offlineDeviceId), logger.Any("code", code), logger.Any("reason", text), logger.Any("还剩设备:", len(clients)))
 		return nil
 	})
 
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
-			logger.Info("读取WebSocket消息出错", logger.Any("err", err))
-
+			logger.Info("读取WebSocket消息出错", logger.Any("err", err), logger.Any("出错地址", remoteAddr))
+			return
 		}
 
 		// 将字节切片转换为字符串

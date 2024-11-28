@@ -425,7 +425,7 @@ func (d *userDao) GetUserIdByUserMachineCode(ctx context.Context, machine_code s
 		//create user
 		err := d.Create(ctx, &model.User{
 			MachineCode: machine_code,
-			Sms:         "0",
+			Sms:         time.Now(),
 		})
 		if err != nil {
 			return nil, err

@@ -72,17 +72,21 @@ func NewWebsocketHandler() WebsocketHandler {
 			cache.NewUnanswerdCallCache(model.GetCacheType())),
 	}
 }
+func closeConn(remoteAddr string) {
+	offlineDeviceId := ip2deviceID[remoteAddr]
+	delete(ip2deviceID, remoteAddr)
+	deleteClient(offlineDeviceId)
+}
 
 func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
 
 	defer conn.Close()
 	remoteAddr := conn.RemoteAddr().String()
+	firstHeartbeatTime := time.Time{} // 初始化首次收到心跳的时间为零值（即时间零点）
 	// 注册关闭事件处理函数
 	conn.SetCloseHandler(func(code int, text string) error {
-		offlineDeviceId := ip2deviceID[remoteAddr]
-		delete(ip2deviceID, remoteAddr)
-		deleteClient(offlineDeviceId)
-		logger.Info("WebSocket客户端断开连接", logger.Any("掉线设备", offlineDeviceId), logger.Any("code", code), logger.Any("reason", text), logger.Any("还剩设备:", len(clients)))
+		closeConn(remoteAddr)
+		logger.Info("WebSocket客户端断开连接", logger.Any("code", code), logger.Any("reason", text), logger.Any("还剩设备:", len(clients)))
 		return nil
 	})
 
@@ -116,8 +120,28 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 
 					// toMachineIDStr:=dataMap["to"].(string)
 					if eventStr == "heartbeat" {
+						currentTime := time.Now()
+						if firstHeartbeatTime.IsZero() {
+							// 如果是首次收到心跳消息，记录当前时间
+							firstHeartbeatTime = currentTime
+							logger.Info("首次收到心跳")
+						} else {
+							// 计算距离首次收到心跳的时间间隔
+							duration := currentTime.Sub(firstHeartbeatTime)
+							if duration.Seconds() > 60 {
+								logger.Info("等待设备发送心跳超时，主动断开")
+								closeConn(remoteAddr)
+								// 时间间隔大于10秒，断开连接
+								conn.Close()
+								break
+
+							}
+						}
 						// clients[dataStr] = conn
+						logger.Info("收到心跳包", logger.Any("设备ID", dataStr), logger.Any("地址", remoteAddr))
 						updateClients(dataStr, conn)
+						// reply client that the sever has recieve the message
+						sendDataToSpecificClient(conn, generateServerWebsocketMsg("I am sever,I have recived your message", "hi"))
 						// updateHeartBeatInfo(w, ctx, dataStr, remoteAddr)
 					}
 
@@ -359,6 +383,7 @@ func (w websocketHandler) GetOnlineClients(c *gin.Context) {
 // }
 
 func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
+	logger.Infof("开始给客户端发送消息", logger.Any("设备ID", conn.RemoteAddr().String()))
 	if err := writeMessageWithLogging(conn, websocket.TextMessage, message); err != nil {
 		return err
 	}

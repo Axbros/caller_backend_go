@@ -21,7 +21,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/ws"
 )
 
-var HEARTBEAT_TIME float64 = 10
+var HEARTBEAT_TIME float64 = 120
 var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
 var ip2deviceID = make(map[string]string)
@@ -144,7 +144,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 						logger.Info("收到心跳包", logger.Any("设备ID", dataStr), logger.Any("地址", remoteAddr), logger.Any("当前时间", currentTime))
 						updateClients(dataStr, conn)
 						// reply client that the sever has recieve the message
-						sendDataToSpecificClient(conn, generateServerWebsocketMsg("I am sever,I have recived your message", "hi"))
+						// sendDataToSpecificClient(conn, generateServerWebsocketMsg("I am sever,I have recived your message", "hi"))
 						// updateHeartBeatInfo(w, ctx, dataStr, remoteAddr)
 					}
 

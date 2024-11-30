@@ -27,6 +27,8 @@ type RedisDao interface {
 
 	PushClient2GroupName(ctx context.Context, prefix string, groupName string, clientID int) error
 	DeleteRedisKeysWithPrefix(ctx context.Context, prefix string) error
+	PushOfflinePhoneNumber(ctx context.Context, key string, value interface{}) error
+	GetAllOfflinePhoneNumber(ctx context.Context, key string) ([]string, error)
 }
 
 type redisDao struct {
@@ -51,6 +53,12 @@ func NewRedisDao(client *redis.Client) RedisDao {
 //		}
 //		return nil
 //	}
+func (r *redisDao) PushOfflinePhoneNumber(ctx context.Context, key string, value interface{}) error {
+	return r.client.LPush(ctx, key, value).Err()
+}
+func (r *redisDao) GetAllOfflinePhoneNumber(ctx context.Context, key string) ([]string, error) {
+	return r.client.LRange(ctx, key, 0, -1).Result()
+}
 
 func (r *redisDao) PushClient2GroupName(ctx context.Context, prefix string, groupName string, clientID int) error {
 	key := prefix + groupName

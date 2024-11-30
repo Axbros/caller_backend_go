@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -21,7 +22,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/ws"
 )
 
-var HEARTBEAT_TIME float64 = 120
+var HEARTBEAT_TIME float64 = 65
 var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
 var ip2deviceID = make(map[string]string)
@@ -78,7 +79,15 @@ func closeConn(remoteAddr string) {
 	delete(ip2deviceID, remoteAddr)
 	deleteClient(offlineDeviceId)
 }
-
+func appendOfflinePhoneNumber(ctx context.Context, parentId string, phoneNumber string) {
+	redisDao := dao.NewRedisDao(model.GetRedisCli())
+	// 把phoneNumber 添加到redis队列中
+	redisDao.PushOfflinePhoneNumber(context.Background(), "offline:"+parentId, phoneNumber)
+}
+func getOfflinePhoneNumber(ctx context.Context, parentId string) ([]string, error) {
+	redisDao := dao.NewRedisDao(model.GetRedisCli())
+	return redisDao.GetAllOfflinePhoneNumber(ctx, "offline:"+parentId)
+}
 func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
 
 	defer conn.Close()
@@ -116,17 +125,23 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 				eventStr, ok := eventValue.(string)
 				if ok {
 					jsonStr, _ := json.Marshal(dataMap)
-					dataStr, _ := dataMap["data"].(string)
+					dataStr, _ := dataMap["data"].(string) // 话机ID
 					userTypeStr, _ := dataMap["type"].(string)
-
-					// toMachineIDStr:=dataMap["to"].(string)
 					if eventStr == "heartbeat" {
 						currentTime := time.Now()
 						if lastHeartbeatTime.IsZero() {
 							// 如果是首次收到心跳消息，记录当前时间
 							lastHeartbeatTime = currentTime
-							logger.Info("首次收到心跳")
+							if userTypeStr == "user" { //甲方上线 首先检查是否有离线消息
+								//read from redis offline queue
+								offlinePhoneNumbers, err := getOfflinePhoneNumber(ctx, dataStr)
+								if err != nil {
+									logger.Error("GetAllOfflinePhoneNumber error", logger.Err(err))
+								}
+								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("offline", strings.Join(offlinePhoneNumbers, ","), "", "offline"))
+							}
 						} else {
+							// todo 话机没有发送心跳 配置好了心跳再打开下面代码
 							// 计算距离首次收到心跳的时间间隔
 							duration := currentTime.Sub(lastHeartbeatTime)
 							if duration.Seconds() > HEARTBEAT_TIME {
@@ -135,7 +150,6 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 								// 时间间隔大于10秒，断开连接
 								conn.Close()
 								break
-
 							}
 						}
 						// clients[dataStr] = conn
@@ -146,6 +160,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 						// reply client that the sever has recieve the message
 						// sendDataToSpecificClient(conn, generateServerWebsocketMsg("I am sever,I have recived your message", "hi"))
 						// updateHeartBeatInfo(w, ctx, dataStr, remoteAddr)
+
 					}
 
 					if userTypeStr == "client" { //处理客户端的消息
@@ -162,8 +177,11 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							if parent.ID > 0 {
 								dataMap["to"] = parentIdStr
 								parentConn := readFromClients(parentIdStr)
-
-								sendDataToSpecificClient(parentConn, jsonStr)
+								if parentConn != nil {
+									sendDataToSpecificClient(parentConn, jsonStr)
+								} else {
+									appendOfflinePhoneNumber(ctx, parentIdStr, dataMap["message"].(string))
+								}
 								if eventStr == "income" {
 									w.cDao.Create(ctx, &model.UnanswerdCall{
 										MachineId:    dataStr,
@@ -172,13 +190,11 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 										Type:         "income",
 									})
 								}
-								logger.Info("websocket", logger.String("send message", messageStr), logger.String("receive address", parentConn.RemoteAddr().String()))
+
 							} else {
-								err := conn.WriteMessage(websocket.TextMessage, []byte("当前没有在线的甲方设备,甲方ID："+parentIdStr))
-								logger.Info("Not Found", logger.String("client", remoteAddr), logger.String("user", parentIdStr))
-								if err != nil {
-									logger.Error("send message error", logger.Err(err))
-								}
+								// 甲方设备不在线 存在缓存中 等待上线后进行推送
+
+								logger.Info("未绑定甲方设备", logger.String("client", remoteAddr), logger.String("user", parentIdStr))
 							}
 						}
 
@@ -386,11 +402,14 @@ func (w websocketHandler) GetOnlineClients(c *gin.Context) {
 // }
 
 func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
-	logger.Infof("开始给客户端发送消息", logger.Any("设备ID", conn.RemoteAddr().String()))
-	if err := writeMessageWithLogging(conn, websocket.TextMessage, message); err != nil {
-		return err
+	if conn != nil {
+		logger.Infof("开始给客户端发送消息", logger.Any("设备ID", conn.RemoteAddr().String()))
+		if err := writeMessageWithLogging(conn, websocket.TextMessage, message); err != nil {
+			return err
+		}
+		time.Sleep(500 * time.Millisecond) // 暂停一段时间，可能为了防止消息发送过快
+		return nil
 	}
-	time.Sleep(500 * time.Millisecond) // 暂停一段时间，可能为了防止消息发送过快
 	return nil
 }
 

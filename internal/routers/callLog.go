@@ -28,4 +28,5 @@ func callLogRouter(group *gin.RouterGroup, h handler.UnanswerdCallHandler) {
 	group.POST("/callLog/list/ids", h.ListByIDs)
 	group.GET("/callLog/list", h.ListByLastID)
 	group.GET("/callLog/byUserId/:id", h.GetByUserID)
+	group.GET("/callLog/read_offline_message_by_user_id/:user_id", h.ReadOfflineMessage)
 }

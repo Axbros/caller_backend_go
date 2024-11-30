@@ -28,4 +28,5 @@ func websocketRouter(group *gin.RouterGroup, h handler.WebsocketHandler) {
 		}
 	})
 	group.GET("/online", h.GetOnlineClients)
+
 }

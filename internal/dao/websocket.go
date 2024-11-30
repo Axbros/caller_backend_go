@@ -27,8 +27,8 @@ type RedisDao interface {
 
 	PushClient2GroupName(ctx context.Context, prefix string, groupName string, clientID int) error
 	DeleteRedisKeysWithPrefix(ctx context.Context, prefix string) error
-	PushOfflinePhoneNumber(ctx context.Context, key string, value interface{}) error
-	GetAllOfflinePhoneNumber(ctx context.Context, key string) ([]string, error)
+	SetOfflineMsgUnread(ctx context.Context, parentId string, status string) error
+	GetOfflineMsgUnread(ctx context.Context, parentId string) (string, error)
 }
 
 type redisDao struct {
@@ -43,6 +43,17 @@ func NewRedisDao(client *redis.Client) RedisDao {
 		sfg:    new(singleflight.Group),
 	}
 }
+func (r *redisDao) SetOfflineMsgUnread(ctx context.Context, parentId string, status string) error {
+	return r.client.Set(ctx, "offline:"+parentId, status, 0).Err()
+}
+func (r *redisDao) GetOfflineMsgUnread(ctx context.Context, parentId string) (string, error) {
+	// if the key does not exist, return an empty string
+	value, err := r.client.Get(ctx, "offline:"+parentId).Result()
+	if err == redis.Nil {
+		return "false", nil
+	}
+	return value, err
+}
 
 //	func (r *redisDao) SetIPAddrByMachineCode2WebsocketConnections(ctx context.Context, key string, value string) error {
 //		// 设置 Hash 字段值
@@ -53,12 +64,6 @@ func NewRedisDao(client *redis.Client) RedisDao {
 //		}
 //		return nil
 //	}
-func (r *redisDao) PushOfflinePhoneNumber(ctx context.Context, key string, value interface{}) error {
-	return r.client.LPush(ctx, key, value).Err()
-}
-func (r *redisDao) GetAllOfflinePhoneNumber(ctx context.Context, key string) ([]string, error) {
-	return r.client.LRange(ctx, key, 0, -1).Result()
-}
 
 func (r *redisDao) PushClient2GroupName(ctx context.Context, prefix string, groupName string, clientID int) error {
 	key := prefix + groupName

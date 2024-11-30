@@ -36,6 +36,7 @@ type UnanswerdCallHandler interface {
 	ListByIDs(c *gin.Context)
 	ListByLastID(c *gin.Context)
 	GetByUserID(c *gin.Context)
+	ReadOfflineMessage(c *gin.Context)
 }
 
 type callLogHandler struct {
@@ -527,4 +528,12 @@ func convertUnanswerdCalls(fromValues []*model.UnanswerdCall) ([]*types.Unanswer
 	}
 
 	return toValues, nil
+}
+
+func (h *callLogHandler) ReadOfflineMessage(c *gin.Context) {
+	userID := c.Param("user_id")
+	setOfflineMsgUnread(c, userID, "false")
+	response.Success(c, gin.H{
+		"status": "ok",
+	})
 }

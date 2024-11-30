@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -79,14 +78,14 @@ func closeConn(remoteAddr string) {
 	delete(ip2deviceID, remoteAddr)
 	deleteClient(offlineDeviceId)
 }
-func appendOfflinePhoneNumber(ctx context.Context, parentId string, phoneNumber string) {
+func setOfflineMsgUnread(ctx context.Context, parentId string, status string) {
 	redisDao := dao.NewRedisDao(model.GetRedisCli())
 	// 把phoneNumber 添加到redis队列中
-	redisDao.PushOfflinePhoneNumber(context.Background(), "offline:"+parentId, phoneNumber)
+	redisDao.SetOfflineMsgUnread(ctx, parentId, status)
 }
-func getOfflinePhoneNumber(ctx context.Context, parentId string) ([]string, error) {
+func getOfflineMsgUnread(ctx context.Context, parentId string) (string, error) {
 	redisDao := dao.NewRedisDao(model.GetRedisCli())
-	return redisDao.GetAllOfflinePhoneNumber(ctx, "offline:"+parentId)
+	return redisDao.GetOfflineMsgUnread(ctx, parentId)
 }
 func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
 
@@ -134,11 +133,11 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 							lastHeartbeatTime = currentTime
 							if userTypeStr == "user" { //甲方上线 首先检查是否有离线消息
 								//read from redis offline queue
-								offlinePhoneNumbers, err := getOfflinePhoneNumber(ctx, dataStr)
+								offlineMsgStatus, err := getOfflineMsgUnread(ctx, dataStr)
 								if err != nil {
 									logger.Error("GetAllOfflinePhoneNumber error", logger.Err(err))
 								}
-								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("offline", strings.Join(offlinePhoneNumbers, ","), "", "offline"))
+								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("offline", offlineMsgStatus, "", "offline"))
 							}
 						} else {
 							// todo 话机没有发送心跳 配置好了心跳再打开下面代码
@@ -180,7 +179,13 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 								if parentConn != nil {
 									sendDataToSpecificClient(parentConn, jsonStr)
 								} else {
-									appendOfflinePhoneNumber(ctx, parentIdStr, dataMap["message"].(string))
+									setOfflineMsgUnread(ctx, parentIdStr, "true")
+									w.cDao.Create(ctx, &model.UnanswerdCall{
+										MachineId:    dataStr,
+										MobileNumber: dataMap["message"].(string),
+										Location:     dataMap["from"].(string),
+										Type:         "offline",
+									})
 								}
 								if eventStr == "income" {
 									w.cDao.Create(ctx, &model.UnanswerdCall{
@@ -437,4 +442,12 @@ func writeMessageWithLogging(conn *ws.Conn, messageType int, message []byte) err
 		return errors.New("device received is offline, the message has been aborted")
 	}
 	return nil
+}
+
+func (w websocketHandler) ReadOfflineMessage(c *gin.Context) {
+	userID := c.Param("user_id")
+	setOfflineMsgUnread(c, userID, "false")
+	response.Success(c, gin.H{
+		"status": "ok",
+	})
 }

@@ -47,6 +47,7 @@ docs:
 # build caller for linux amd64 binary
 build:
 	@echo "building 'caller', linux binary file will output to 'cmd/caller'"
+# 主服务器 @cd cmd/caller && CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build
 	@cd cmd/caller && CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build
 
 

@@ -12,6 +12,7 @@ import (
 	"github.com/zhufuyi/sponge/pkg/servicerd/registry"
 
 	"caller/internal/config"
+	"caller/internal/handler"
 	"caller/internal/routers"
 )
 
@@ -45,7 +46,7 @@ func (s *httpServer) Start() error {
 			return fmt.Errorf("listen server error: %v", err)
 		}
 	}
-
+	handler.NewWebsocketHandler().CheckHeartBeat()
 	return nil
 }
 

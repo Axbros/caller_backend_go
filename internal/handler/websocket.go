@@ -21,9 +21,12 @@ import (
 	"github.com/zhufuyi/sponge/pkg/ws"
 )
 
-var HEARTBEAT_TIME float64 = 65
 var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
+
+// 存储每个客户端的最后心跳时间
+var clientLastHeartbeat = make(map[string]time.Time)
+
 var ip2deviceID = make(map[string]string)
 
 const (
@@ -33,10 +36,23 @@ const (
 	HeartbeatTimeout = 10 * time.Second
 )
 
-func deleteClient(key string) {
+func closeConn(remoteAddr string) {
+	// 加写锁，确保同一时间只有一个 goroutine 可以进行写操作
 	rwMu.Lock()
+	defer rwMu.Unlock()
+
+	// 从 ip2deviceID 中获取 offlineDeviceId
+	offlineDeviceId, exists := ip2deviceID[remoteAddr]
+	if exists {
+		// 删除 ip2deviceID 中的对应项
+		delete(ip2deviceID, remoteAddr)
+		// 调用 deleteClient 函数删除客户端
+		deleteClient(offlineDeviceId)
+	}
+}
+
+func deleteClient(key string) {
 	delete(clients, key)
-	rwMu.Unlock() // 添加Unlock来释放锁
 	logger.Info("删除设备", logger.Any("设备ID", key))
 }
 
@@ -49,8 +65,8 @@ func readFromClients(key string) *websocket.Conn {
 
 func updateClients(key string, value *websocket.Conn) {
 	logger.Info("检测到设备加入", logger.Any("设备ID", key))
-	ip2deviceID[value.RemoteAddr().String()] = key
 	rwMu.Lock()
+	ip2deviceID[value.RemoteAddr().String()] = key
 	clients[key] = value
 	rwMu.Unlock() // 确保在记录日志前释放锁
 }
@@ -58,6 +74,7 @@ func updateClients(key string, value *websocket.Conn) {
 type WebsocketHandler interface {
 	LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 	GetOnlineClients(ctx *gin.Context)
+	CheckHeartBeat()
 }
 type websocketHandler struct {
 	iDao dao.RedisDao
@@ -80,46 +97,59 @@ func NewWebsocketHandler() WebsocketHandler {
 			cache.NewUnanswerdCallCache(model.GetCacheType())),
 	}
 }
-func closeConn(remoteAddr string) {
-	offlineDeviceId := ip2deviceID[remoteAddr]
-	delete(ip2deviceID, remoteAddr)
-	deleteClient(offlineDeviceId)
-}
+
 func setOfflineMsgUnread(ctx context.Context, parentId string, status string) {
 	redisDao := dao.NewRedisDao(model.GetRedisCli())
 	// 把phoneNumber 添加到redis队列中
 	redisDao.SetOfflineMsgUnread(ctx, parentId, status)
 }
-func getOfflineMsgUnread(ctx context.Context, parentId string) (string, error) {
-	redisDao := dao.NewRedisDao(model.GetRedisCli())
-	return redisDao.GetOfflineMsgUnread(ctx, parentId)
-}
-func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
-	// 用于控制心跳检测的停止
-	done := make(chan struct{})
-	defer conn.Close()
-	remoteAddr := conn.RemoteAddr().String()
-	lastHeartbeatTime := time.Time{} // 初始化上一次收到心跳的时间为零值
-	// 启动心跳检测协程
+
+func startHeartbeatCheck(done chan struct{}) {
 	go func() {
 		ticker := time.NewTicker(HeartbeatInterval)
 		defer ticker.Stop()
 		for {
 			select {
 			case <-ticker.C:
-				// 检查是否超时
-				if time.Since(lastHeartbeatTime) > HeartbeatTimeout {
-					fmt.Println("客户端可能断网")
-					// 关闭连接
-					conn.Close()
-					closeConn(conn.RemoteAddr().String())
-					return
+				rwMu.RLock()
+				// 遍历每个客户端的最后心跳时间
+				for deviceID, lastTime := range clientLastHeartbeat {
+					logger.Info("正在遍历客户端心跳数据", logger.Any("deviceID", deviceID), logger.Any("lastTime", lastTime))
+					if time.Since(lastTime) > HeartbeatTimeout {
+						rwMu.RUnlock()
+						rwMu.Lock()
+						fmt.Printf("客户端 %s 可能断网\n", deviceID)
+						// 这里假设可以通过 deviceID 找到对应的连接并关闭
+						// 实际中你可能需要根据具体的 clients 存储结构来处理
+						conn := readFromClients(deviceID)
+						if conn != nil {
+							conn.Close()
+						}
+
+						closeConn(deviceID)
+						rwMu.Unlock()
+						rwMu.RLock()
+					}
 				}
+				rwMu.RUnlock()
 			case <-done:
 				return
 			}
 		}
 	}()
+}
+
+func (w websocketHandler) CheckHeartBeat() {
+	logger.Info("开始监听心跳包")
+	done := make(chan struct{})
+	startHeartbeatCheck(done)
+
+}
+func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
+	// 用于控制心跳检测的停止
+	done := make(chan struct{})
+	defer conn.Close()
+	remoteAddr := conn.RemoteAddr().String()
 
 	conn.SetCloseHandler(func(code int, text string) error {
 		closeConn(remoteAddr)
@@ -156,36 +186,12 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 					userTypeStr, _ := dataMap["type"].(string)
 					if eventStr == "heartbeat" {
 						currentTime := time.Now()
-						// if lastHeartbeatTime.IsZero() {
-						// 	// 如果是首次收到心跳消息，记录当前时间
-						// 	lastHeartbeatTime = currentTime
-						// 	if userTypeStr == "user" { //甲方上线 首先检查是否有离线消息
-						// 		//read from redis offline queue
-						// 		offlineMsgStatus, err := getOfflineMsgUnread(ctx, dataStr)
-						// 		if err != nil {
-						// 			logger.Error("GetAllOfflinePhoneNumber error", logger.Err(err))
-						// 		}
-						// 		sendDataToSpecificClient(conn, generateStandardWebsocketMsg("offline", offlineMsgStatus, "", "offline"))
-						// 	}
-						// } else {
-						// 	duration := currentTime.Sub(lastHeartbeatTime)
-						// 	if duration.Seconds() > HEARTBEAT_TIME {
-						// 		logger.Info("等待设备发送心跳超时，主动断开")
-						// 		closeConn(remoteAddr)
-						// 		// 时间间隔大于10秒，断开连接
-						// 		conn.Close()
-						// 		break
-						// 	}
-						// }
+						rwMu.Lock()
 						clients[dataStr] = conn
-						// 更新上一次收到心跳的时间为当前时间
-						lastHeartbeatTime = currentTime
+						clientLastHeartbeat[dataStr] = currentTime
+						rwMu.Unlock()
 						logger.Info("收到心跳包", logger.Any("设备ID", dataStr), logger.Any("地址", remoteAddr), logger.Any("当前时间", currentTime))
 						updateClients(dataStr, conn)
-						// reply client that the sever has recieve the message
-						// sendDataToSpecificClient(conn, generateServerWebsocketMsg("I am sever,I have recived your message", "hi"))
-						// updateHeartBeatInfo(w, ctx, dataStr, remoteAddr)
-
 					}
 
 					if userTypeStr == "client" { //处理客户端的消息
@@ -423,14 +429,6 @@ func (w websocketHandler) GetOnlineClients(c *gin.Context) {
 		"count":   len(res),
 	})
 }
-
-// func updateHeartBeatInfo(w websocketHandler, ctx context.Context, machine_code, ip_address string) {
-// 	err := w.iDao.SetIPAddrByMachineCode2WebsocketConnections(ctx, machine_code, ip_address)
-// 	if err != nil {
-// 		logger.Errorf("set connection error %s", "heartbeat", logger.Err(err))
-// 		return
-// 	}
-// }
 
 func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
 	if conn != nil {

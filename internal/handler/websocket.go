@@ -26,6 +26,13 @@ var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
 var ip2deviceID = make(map[string]string)
 
+const (
+	// 心跳间隔
+	HeartbeatInterval = 5 * time.Second
+	// 超时时间
+	HeartbeatTimeout = 10 * time.Second
+)
+
 func deleteClient(key string) {
 	rwMu.Lock()
 	delete(clients, key)
@@ -88,11 +95,32 @@ func getOfflineMsgUnread(ctx context.Context, parentId string) (string, error) {
 	return redisDao.GetOfflineMsgUnread(ctx, parentId)
 }
 func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
-
+	// 用于控制心跳检测的停止
+	done := make(chan struct{})
 	defer conn.Close()
 	remoteAddr := conn.RemoteAddr().String()
 	lastHeartbeatTime := time.Time{} // 初始化上一次收到心跳的时间为零值
-	// 注册关闭事件处理函数
+	// 启动心跳检测协程
+	go func() {
+		ticker := time.NewTicker(HeartbeatInterval)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				// 检查是否超时
+				if time.Since(lastHeartbeatTime) > HeartbeatTimeout {
+					fmt.Println("客户端可能断网")
+					// 关闭连接
+					conn.Close()
+					closeConn(conn.RemoteAddr().String())
+					return
+				}
+			case <-done:
+				return
+			}
+		}
+	}()
+
 	conn.SetCloseHandler(func(code int, text string) error {
 		closeConn(remoteAddr)
 		logger.Info("WebSocket客户端断开连接", logger.Any("code", code), logger.Any("reason", text), logger.Any("还剩设备:", len(clients)))
@@ -128,30 +156,28 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 					userTypeStr, _ := dataMap["type"].(string)
 					if eventStr == "heartbeat" {
 						currentTime := time.Now()
-						if lastHeartbeatTime.IsZero() {
-							// 如果是首次收到心跳消息，记录当前时间
-							lastHeartbeatTime = currentTime
-							if userTypeStr == "user" { //甲方上线 首先检查是否有离线消息
-								//read from redis offline queue
-								offlineMsgStatus, err := getOfflineMsgUnread(ctx, dataStr)
-								if err != nil {
-									logger.Error("GetAllOfflinePhoneNumber error", logger.Err(err))
-								}
-								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("offline", offlineMsgStatus, "", "offline"))
-							}
-						} else {
-							// todo 话机没有发送心跳 配置好了心跳再打开下面代码
-							// 计算距离首次收到心跳的时间间隔
-							duration := currentTime.Sub(lastHeartbeatTime)
-							if duration.Seconds() > HEARTBEAT_TIME {
-								logger.Info("等待设备发送心跳超时，主动断开")
-								closeConn(remoteAddr)
-								// 时间间隔大于10秒，断开连接
-								conn.Close()
-								break
-							}
-						}
-						// clients[dataStr] = conn
+						// if lastHeartbeatTime.IsZero() {
+						// 	// 如果是首次收到心跳消息，记录当前时间
+						// 	lastHeartbeatTime = currentTime
+						// 	if userTypeStr == "user" { //甲方上线 首先检查是否有离线消息
+						// 		//read from redis offline queue
+						// 		offlineMsgStatus, err := getOfflineMsgUnread(ctx, dataStr)
+						// 		if err != nil {
+						// 			logger.Error("GetAllOfflinePhoneNumber error", logger.Err(err))
+						// 		}
+						// 		sendDataToSpecificClient(conn, generateStandardWebsocketMsg("offline", offlineMsgStatus, "", "offline"))
+						// 	}
+						// } else {
+						// 	duration := currentTime.Sub(lastHeartbeatTime)
+						// 	if duration.Seconds() > HEARTBEAT_TIME {
+						// 		logger.Info("等待设备发送心跳超时，主动断开")
+						// 		closeConn(remoteAddr)
+						// 		// 时间间隔大于10秒，断开连接
+						// 		conn.Close()
+						// 		break
+						// 	}
+						// }
+						clients[dataStr] = conn
 						// 更新上一次收到心跳的时间为当前时间
 						lastHeartbeatTime = currentTime
 						logger.Info("收到心跳包", logger.Any("设备ID", dataStr), logger.Any("地址", remoteAddr), logger.Any("当前时间", currentTime))
@@ -383,7 +409,7 @@ func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 		}
 		logger.Info("websocket", logger.String("messageStr", messageStr), logger.String("remoteAddr", remoteAddr))
 	}
-
+	close(done)
 }
 
 func (w websocketHandler) GetOnlineClients(c *gin.Context) {

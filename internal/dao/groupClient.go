@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"golang.org/x/sync/singleflight"
@@ -37,6 +38,8 @@ type GroupClientDao interface {
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.GroupClient) error
 
 	GetGroupNameAndClientIDs(ctx context.Context) ([]*model.GroupClient, error)
+	GetGroupNameByClientID(ctx context.Context, clientID string) (string, error)
+	GetGroupOwnerIDByClientID(ctx context.Context, clientID string) (string, error)
 }
 
 type groupClientDao struct {
@@ -391,4 +394,27 @@ func (d *groupClientDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *mod
 	_ = d.deleteCache(ctx, table.ID)
 
 	return err
+}
+
+func (d *groupClientDao) GetGroupNameByClientID(ctx context.Context, clientID string) (string, error) {
+	var record model.GroupClient
+	err := d.db.WithContext(ctx).Where("client_id = ?", clientID).First(&record).Error
+	if err != nil {
+		return "", err
+	}
+	return record.GroupName, nil
+}
+
+func (d *groupClientDao) GetGroupOwnerIDByClientID(ctx context.Context, clientID string) (string, error) {
+	var GroupRecord model.GroupClient
+	var DistributionRecord model.Distribution
+	err := d.db.WithContext(ctx).Where("client_id = ?", clientID).First(&GroupRecord).Error
+	if err != nil {
+		return "", err
+	}
+	err = d.db.Model(&model.Distribution{}).WithContext(ctx).Where("group_name = ?", GroupRecord.GroupName).First(&DistributionRecord).Error
+	if err != nil {
+		return "", err
+	}
+	return strconv.Itoa(DistributionRecord.UserID), nil
 }

@@ -463,8 +463,28 @@ func (h *userHandler) GetUserIdByUserMachineCode(c *gin.Context) {
 		response.Output(c, ecode.InternalServerError.ToHTTPCode())
 		return
 	}
+	distribution, err := h.iDao.GetGroupNameByUserID(c, user.ID)
+	if err != nil {
+		logger.Error("GetGroupNameByUserID", logger.Err(err), logger.Any("user id", user.ID), middleware.GCtxRequestIDField(c))
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		return
+	}
+	groupMembers, err := h.iDao.GetGroupMembersByGroupName(c, distribution.GroupName)
+	if err != nil {
+		logger.Error("GetGroupMembersByGroupName", logger.Err(err), logger.Any("group name", distribution.GroupName), middleware.GCtxRequestIDField(c))
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		return
+	}
+
+	clients := make([]int, 0)
+	for _, v := range groupMembers {
+		clients = append(clients, v.ClientID)
+	}
+
 	response.Success(c, gin.H{
-		"user": user,
+		"user":    user,
+		"group":   distribution.GroupName,
+		"clients": clients,
 	})
 }
 

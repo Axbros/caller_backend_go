@@ -37,7 +37,7 @@ type DistributionDao interface {
 	DeleteByTx(ctx context.Context, tx *gorm.DB, id uint64) error
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.Distribution) error
 
-	GetDistributedGroupCallIdByUserId(ctx context.Context, userId string) (groupcallId uint64)
+	GetDistributedGroupNameByUserId(ctx context.Context, userId string) (GroupName string)
 }
 
 type distributionDao struct {
@@ -103,8 +103,8 @@ func (d *distributionDao) updateDataByID(ctx context.Context, db *gorm.DB, table
 	if table.UserID != 0 {
 		update["user_id"] = table.UserID
 	}
-	if table.GroupCallID != 0 {
-		update["group_call_id"] = table.GroupCallID
+	if table.GroupName != "" {
+		update["group_name"] = table.GroupName
 	}
 
 	return db.WithContext(ctx).Model(table).Updates(update).Error
@@ -387,12 +387,12 @@ func (d *distributionDao) UpdateByTx(ctx context.Context, tx *gorm.DB, table *mo
 
 	return err
 }
-func (d *distributionDao) GetDistributedGroupCallIdByUserId(ctx context.Context, userId string) (groupcallId uint64) {
+func (d *distributionDao) GetDistributedGroupNameByUserId(ctx context.Context, userId string) (GroupName string) {
 	var record *model.Distribution
 	err := d.db.WithContext(ctx).Where("distribution.user_id =?", userId).Find(&record).Error
 	if err != nil {
-		logger.Error("getDistributedGroupCallIdByUserId", logger.Err(err), logger.String("user id", userId))
+		logger.Error("getDistributedClientIdByUserId", logger.Err(err), logger.String("user id", userId))
 
 	}
-	return record.GroupCallID
+	return record.GroupName
 }

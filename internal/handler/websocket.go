@@ -4,30 +4,66 @@ import (
 	"caller/internal/cache"
 	"caller/internal/dao"
 	"caller/internal/model"
-	"caller/internal/utils"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
+	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/zhufuyi/sponge/pkg/ggorm/query"
 	"github.com/zhufuyi/sponge/pkg/gin/response"
 	"github.com/zhufuyi/sponge/pkg/logger"
 	"github.com/zhufuyi/sponge/pkg/ws"
 )
+
+type ContentType string
+
+// 定义 ContentType 的枚举值
+const (
+	Call        ContentType = "call"
+	EndCall     ContentType = "endcall"
+	Idle        ContentType = "idle"
+	Ping        ContentType = "ping"
+	Pong        ContentType = "pong"
+	SendFail    ContentType = "SendFail"
+	SendSuccess ContentType = "SendSuccess"
+	SendSMS     ContentType = "SendSMS"
+	Income      ContentType = "income"
+	Answer      ContentType = "answer"
+	NewSMS      ContentType = "new_sms"
+)
+
+// 定义一个结构体来存储连接信息
+type ConnectionInfo struct {
+	Conn              *websocket.Conn
+	RemoteAddr        string    // 远程地址
+	LastHeartbeatTime time.Time // 最后心跳时间
+}
+
+// 定义一个全局的 map 来存储所有用户的连接信息
+var connectionMap = make(map[string]ConnectionInfo)
+
+// 使用互斥锁来保证并发安全
+var mutex sync.Mutex
+
+// ContentBody 定义与 JavaScript 对象对应的结构体
+type ContentBody struct {
+	ContentType ContentType `json:"contentType"`
+	Content     interface{} `json:"content"`
+	SenderID    string      `json:"senderID"`
+	ReceiveID   string      `json:"receiveID"`
+	ClientMsgID string      `json:"clientMsgID"`
+}
 
 var rwMu sync.RWMutex
 var clients = make(map[string]*websocket.Conn)
 
 // 存储每个客户端的最后心跳时间
 var clientLastHeartbeat = make(map[string]time.Time)
-
-var ip2deviceID = make(map[string]string)
 
 const (
 	// 心跳间隔
@@ -36,75 +72,25 @@ const (
 	HeartbeatTimeout = 10 * time.Second
 )
 
-func closeConn(remoteAddr string) {
-	// 加写锁，确保同一时间只有一个 goroutine 可以进行写操作
-	rwMu.Lock()
-	defer rwMu.Unlock()
-
-	// 从 ip2deviceID 中获取 offlineDeviceId
-	offlineDeviceId, exists := ip2deviceID[remoteAddr]
-	if exists {
-		// 删除 ip2deviceID 中的对应项
-		delete(ip2deviceID, remoteAddr)
-		// 调用 deleteClient 函数删除客户端
-		deleteClient(offlineDeviceId)
-	}
-}
-
-func deleteClient(key string) {
-	delete(clients, key)
-	logger.Info("删除设备", logger.Any("设备ID", key))
-}
-
-func readFromClients(key string) *websocket.Conn {
-	rwMu.RLock()
-	defer rwMu.RUnlock() // 使用defer确保锁被释放
-	value := clients[key]
-	return value
-}
-
-func updateClients(key string, value *websocket.Conn) {
-	logger.Info("检测到设备加入", logger.Any("设备ID", key))
-	rwMu.Lock()
-	ip2deviceID[value.RemoteAddr().String()] = key
-	clients[key] = value
-	rwMu.Unlock() // 确保在记录日志前释放锁
-}
-
 type WebsocketHandler interface {
 	LoopReceiveMessage(ctx context.Context, conn *ws.Conn)
 	GetOnlineClients(ctx *gin.Context)
 	CheckHeartBeat()
 }
+
 type websocketHandler struct {
-	iDao dao.RedisDao
-	dDao dao.DistributionDao
-	gDao dao.GroupCallDao
-	uDao dao.UserDao
-	cDao dao.UnanswerdCallDao
+	iDao dao.GroupClientDao
 }
 
 func NewWebsocketHandler() WebsocketHandler {
 	return &websocketHandler{
-		iDao: dao.NewRedisDao(model.GetRedisCli()),
-		dDao: dao.NewDistributionDao(model.GetDB(),
-			cache.NewDistributionCache(model.GetCacheType())),
-		gDao: dao.NewGroupCallDao(model.GetDB(),
-			cache.NewGroupCallCache(model.GetCacheType())),
-		uDao: dao.NewUserDao(model.GetDB(),
-			cache.NewUserCache(model.GetCacheType())),
-		cDao: dao.NewUnanswerdCallDao(model.GetDB(),
-			cache.NewUnanswerdCallCache(model.GetCacheType())),
+		iDao: dao.NewGroupClientDao(model.GetDB(),
+			cache.NewGroupClientCache(model.GetCacheType())),
 	}
 }
 
-func setOfflineMsgUnread(ctx context.Context, parentId string, status string) {
-	redisDao := dao.NewRedisDao(model.GetRedisCli())
-	// 把phoneNumber 添加到redis队列中
-	redisDao.SetOfflineMsgUnread(ctx, parentId, status)
-}
-
 func startHeartbeatCheck(done chan struct{}) {
+	logger.Info("开始心跳检测")
 	go func() {
 		ticker := time.NewTicker(HeartbeatInterval)
 		defer ticker.Stop()
@@ -112,21 +98,15 @@ func startHeartbeatCheck(done chan struct{}) {
 			select {
 			case <-ticker.C:
 				rwMu.RLock()
-				// 遍历每个客户端的最后心跳时间
 				for deviceID, lastTime := range clientLastHeartbeat {
 					logger.Info("正在遍历客户端心跳数据", logger.Any("deviceID", deviceID), logger.Any("lastTime", lastTime))
 					if time.Since(lastTime) > HeartbeatTimeout {
 						rwMu.RUnlock()
 						rwMu.Lock()
 						fmt.Printf("客户端 %s 可能断网\n", deviceID)
-						// 这里假设可以通过 deviceID 找到对应的连接并关闭
-						// 实际中你可能需要根据具体的 clients 存储结构来处理
-						conn := readFromClients(deviceID)
-						if conn != nil {
-							conn.Close()
-						}
 
-						closeConn(deviceID)
+						delete(connectionMap, deviceID)
+						delete(clientLastHeartbeat, deviceID)
 						rwMu.Unlock()
 						rwMu.RLock()
 					}
@@ -143,335 +123,200 @@ func (w websocketHandler) CheckHeartBeat() {
 	logger.Info("开始监听心跳包")
 	done := make(chan struct{})
 	startHeartbeatCheck(done)
-
 }
+
+// 处理消息发送和错误处理的通用函数
+func handleMessageSend(conn *ws.Conn, messageType int, contentBody ContentBody, action ContentType) error {
+	err := sendMessageToUser(conn, contentBody)
+	if err != nil {
+		message := createMessage(SendFail, action, contentBody.SenderID, contentBody.ClientMsgID)
+		return conn.WriteMessage(messageType, message)
+	}
+	return nil
+}
+
+// 获取群主 ID 的通用函数
+func getGroupOwnerID(ctx context.Context, w websocketHandler, senderID string) (string, error) {
+	groupOwnerID, err := w.iDao.GetGroupOwnerIDByClientID(ctx, senderID)
+	if err != nil {
+		logger.Error("GetGroupNameByClientID error", logger.Err(err), logger.Any("clientID", senderID))
+		return "", err
+	}
+	return groupOwnerID, nil
+}
+
 func (w websocketHandler) LoopReceiveMessage(ctx context.Context, conn *ws.Conn) {
-	// 用于控制心跳检测的停止
-	done := make(chan struct{})
 	defer conn.Close()
 	remoteAddr := conn.RemoteAddr().String()
 
 	conn.SetCloseHandler(func(code int, text string) error {
-		closeConn(remoteAddr)
-		logger.Info("WebSocket客户端断开连接", logger.Any("code", code), logger.Any("reason", text), logger.Any("还剩设备:", len(clients)))
+		logger.Info("WebSocket客户端断开连接", logger.Any("code", code), logger.Any("reason", text), logger.Any("还剩设备:", len(clientLastHeartbeat)))
 		return nil
 	})
 
 	for {
-		_, message, err := conn.ReadMessage()
+		messageType, message, err := conn.ReadMessage()
 		if err != nil {
 			logger.Info("读取WebSocket消息出错", logger.Any("err", err), logger.Any("出错地址", remoteAddr))
+			// 根据remoteAddr删除clientLastHeartbeat
+			var deviceID string
+			for k, v := range connectionMap {
+				if v.RemoteAddr == remoteAddr {
+					deviceID = k
+					break
+				}
+			}
+			logger.Info("删除设备", logger.Any("设备ID", deviceID))
+			rwMu.Lock()
+			delete(clientLastHeartbeat, deviceID)
+			delete(connectionMap, deviceID)
+			rwMu.Unlock()
 			return
 		}
 
-		// 将字节切片转换为字符串
-		messageStr := string(message)
-		// 处理消息
-		jsonData, err := utils.ParseTextToJSON(messageStr)
-
-		if err != nil {
-			logger.Error("ParseTextToJSON error", logger.Err(err), logger.String("origin message is", messageStr))
-			continue
-		}
-		// 类型断言判断是否为 map[string]interface{} 类型
-		dataMap, ok := jsonData.(map[string]interface{})
-		if ok {
-			eventValue, exists := dataMap["event"]
-
-			if exists {
-				eventStr, ok := eventValue.(string)
-				if ok {
-					jsonStr, _ := json.Marshal(dataMap)
-					dataStr, _ := dataMap["data"].(string) // 话机ID
-					userTypeStr, _ := dataMap["type"].(string)
-					if eventStr == "heartbeat" {
-						currentTime := time.Now()
-						rwMu.Lock()
-						clients[dataStr] = conn
-						clientLastHeartbeat[dataStr] = currentTime
-						rwMu.Unlock()
-						logger.Info("收到心跳包", logger.Any("设备ID", dataStr), logger.Any("地址", remoteAddr), logger.Any("当前时间", currentTime))
-						updateClients(dataStr, conn)
-					}
-
-					if userTypeStr == "client" { //处理客户端的消息
-
-						if eventStr == "income" || eventStr == "endcall" || eventStr == "connected" || eventStr == "call_done" {
-
-							parent, err := w.uDao.GetUserByClientMachineCode(ctx, dataStr)
-							if err != nil {
-								logger.Error("GetUserByClientMachineCode error", logger.Err(err))
-							}
-							//无论话机是否绑定甲方都将数据存储在redis种
-							// dataMap["from"] = remoteAddr
-							parentIdStr := strconv.FormatUint(parent.ID, 10)
-							if parent.ID > 0 {
-								dataMap["to"] = parentIdStr
-								parentConn := readFromClients(parentIdStr)
-								if parentConn != nil {
-									sendDataToSpecificClient(parentConn, jsonStr)
-								} else {
-									setOfflineMsgUnread(ctx, parentIdStr, "true")
-									w.cDao.Create(ctx, &model.UnanswerdCall{
-										MachineId:    dataStr,
-										MobileNumber: dataMap["message"].(string),
-										Location:     dataMap["from"].(string),
-										Type:         "offline",
-									})
-								}
-								if eventStr == "income" {
-									w.cDao.Create(ctx, &model.UnanswerdCall{
-										MachineId:    dataStr,
-										MobileNumber: dataMap["message"].(string),
-										Location:     dataMap["from"].(string),
-										Type:         "income",
-									})
-								}
-
-							} else {
-								// 甲方设备不在线 存在缓存中 等待上线后进行推送
-
-								logger.Info("未绑定甲方设备", logger.String("client", remoteAddr), logger.String("user", parentIdStr))
-							}
-						}
-
-						if eventStr == "transfer_done" {
-							client_id := dataMap["data"].(string)
-							messageKey := dataMap["key"].(string)
-							message := dataMap["message"].(string)
-							to := dataMap["to"].(string)
-							//此时中专机应在data将自己的id传过来 然后用这个id去group_call表查询transfer_client_id 为 {id}的记录
-							groupcall_record, err := w.gDao.GetByCondition(ctx, &query.Conditions{
-								Columns: []query.Column{
-									{
-										Name:  "transfer_client_id",
-										Value: client_id,
-									},
-								},
-							})
-							if err != nil {
-								logger.Err(err)
-							}
-							//查询到上方的记录就有了group_call.id 拿到这个id去distribution表查询group_call_id=group_call.id的记录
-							distribution_record, _ := w.dDao.GetByCondition(ctx, &query.Conditions{
-								Columns: []query.Column{
-									{
-										Name:  "group_call_id",
-										Value: groupcall_record.ID,
-									},
-								}})
-
-							//上方查询成功后会拿到user_id 把配置成功的消息发给user
-							userConn := readFromClients(strconv.Itoa(distribution_record.UserID))
-							sendDataToSpecificClient(userConn, generateServerWebsocketMsg("中转机已成功配置，即将拨打电话", messageKey))
-							//开始给话机拨打电话
-							var targetMachine *websocket.Conn
-
-							if to != "" {
-								//指定话机拨打
-								targetMachine = readFromClients(to)
-
-							} else {
-								for i := 0; i < len(clients); i++ {
-									queen_client, _ := w.iDao.GetQueenValue(ctx, "group_name_"+groupcall_record.GroupName)
-									if readFromClients(queen_client) != nil {
-										sendDataToSpecificClient(readFromClients(strconv.Itoa(distribution_record.UserID)), generateServerWebsocketMsg("您的话机组名为：【"+groupcall_record.GroupName+"】已从队列取出话机："+queen_client+"即将呼出目标号码", messageKey))
-										targetMachine = readFromClients(queen_client)
-										w.cDao.Create(ctx, &model.UnanswerdCall{
-											MachineId:    queen_client,
-											MobileNumber: message,
-											Location:     "中国·大陆",
-											Type:         "keypad",
-										},
-										)
-										break
-									} else {
-										sendDataToSpecificClient(readFromClients(strconv.Itoa(distribution_record.UserID)), generateServerWebsocketMsg("队列话机不在线，话机ID："+queen_client+"即将队列循环到下一个话机", messageKey))
-										continue
-									}
-								}
-							}
-
-							if targetMachine != nil {
-								//给话机传递指令 拨打中转号码 只有拨号盘拨打出的电话才同步到数据库
-
-								sendDataToSpecificClient(targetMachine, generateStandardWebsocketMsg("call", groupcall_record.PhoneNumber, "", messageKey))
-
-							} else {
-								sendDataToSpecificClient(readFromClients(strconv.Itoa(distribution_record.UserID)), generateServerWebsocketMsg("队列话机不在线", messageKey))
-							}
-
-						}
-					}
-
-					if userTypeStr == "user" {
-						//处理用户端的消息
-						logger.Info("receive from user", logger.String("message", messageStr), logger.String("event", eventStr))
-						data := dataMap["data"].(string)
-						messageStr := dataMap["message"].(string)
-						messageKey := dataMap["key"].(string)
-
-						redisStoreKey := data + ":" + messageKey // 88888888:testkey
-						if eventStr == "receive" {               //表示用户端收到话机的指令 需要执行清除redis操作
-							w.iDao.DeleteMessageStore(ctx, redisStoreKey)
-						}
-						// if eventStr == "missed" || eventStr == "outgoing" {
-						// 	children := strings.Split(messageStr, ",")
-
-						// 	for _, child := range children {
-						// 		if readFromClients(child) != nil {
-						// 			sendDataToSpecificClient(readFromClients(child), jsonStr)
-						// 		}
-						// 	}
-						// }
-						if eventStr == "endcall" {
-							// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
-							//user excute endcall or answer should put the client machine code id to message,data is user machine code id
-							sendDataToSpecificClient(readFromClients(messageStr), jsonStr)
-							//这里的data其实就是client machine code
-							//话机执行了挂断操作 需要 把结果告诉甲方
-							sendDataToSpecificClient(conn, generateServerWebsocketMsg("decline", messageKey))
-						}
-						if eventStr == "answer" {
-							// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
-							// //user excute endcall or answer should put the client machine code id to message,data is user machine code id
-							sendDataToSpecificClient(readFromClients(messageStr), jsonStr)
-							// locationStr := dataMap["from"].(string)
-							w.cDao.Create(ctx, &model.UnanswerdCall{
-								MachineId:    dataStr,
-								MobileNumber: dataMap["message"].(string),
-								Location:     dataMap["from"].(string),
-								Type:         "answer",
-							})
-						}
-						if eventStr == "call" {
-							to := dataMap["to"].(string)
-							//这里面的data就是本机userID
-							// w.iDao.SetMessageStore(ctx, redisStoreKey, jsonStr)
-							sendDataToSpecificClient(conn, generateServerWebsocketMsg("服务端收到指令，正在配置中转设备", messageKey))
-							//todo 根据userID查询中转设备
-							group := w.dDao.GetDistributedGroupCallIdByUserId(ctx, data)
-							if group > 0 {
-								sendDataToSpecificClient(conn, generateServerWebsocketMsg("查询到已采用中转方案，正在获取中转信息", messageKey))
-								group_call_record, err := w.gDao.GetByID(ctx, group)
-								if err != nil {
-									logger.Error("get transfer record error", logger.Err(err), logger.String("group id", string(group)))
-								}
-								transfer_phone := group_call_record.PhoneNumber
-								transfer_machine_id := group_call_record.TransferClientID
-								if transfer_machine_id != "0" {
-									sendDataToSpecificClient(conn, generateServerWebsocketMsg(fmt.Sprintf("中转号码：%s 中转设备:%s", transfer_phone, transfer_machine_id), messageKey))
-
-									if readFromClients(transfer_machine_id) != nil {
-										err := sendDataToSpecificClient(readFromClients(transfer_machine_id), generateStandardWebsocketMsg("transfer", messageStr, to, messageKey))
-										if err != nil {
-											sendDataToSpecificClient(conn, generateServerWebsocketMsg("中转配置出错，中转设备ID："+transfer_machine_id, messageKey))
-										}
-									} else {
-										// for key, value := range clients {
-										// 	fmt.Printf("Key: %s, Value: %s\n", key, value.RemoteAddr)
-										// }
-										sendDataToSpecificClient(conn, generateServerWebsocketMsg("中转设备不在线！请联系管理员处理，中转设备ID："+transfer_machine_id, messageKey))
-									}
-								} else {
-									sendDataToSpecificClient(conn, generateServerWebsocketMsg("当前没有分配中转设备，即将选择直射模式", messageKey))
-									group_name := group_call_record.GroupName
-									for i := 0; i < len(clients); i++ {
-										queen_client, _ := w.iDao.GetQueenValue(ctx, "group_name_"+group_name)
-										if readFromClients(queen_client) != nil {
-											w.cDao.Create(ctx, &model.UnanswerdCall{
-												MachineId:    queen_client,
-												MobileNumber: messageStr,
-												Type:         "keypad",
-											},
-											)
-											sendDataToSpecificClient(readFromClients(queen_client), generateStandardWebsocketMsg("call", messageStr, "", messageKey))
-
-											sendDataToSpecificClient(conn, generateStandardWebsocketMsg("read_success", "设备读取成功", queen_client, messageKey))
-
-											break
-										} else {
-											sendDataToSpecificClient(conn, generateServerWebsocketMsg("队列话机不在线，话机ID："+queen_client+"即将队列循环到下一个话机", messageKey))
-											continue
-										}
-									}
-								}
-								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("flow_done", "流程执行结束", "", messageKey))
-							} else {
-								sendDataToSpecificClient(conn, generateStandardWebsocketMsg("404", "当前未查询到您的绑定关系，请联系管理员核实。", "", "oh_no"))
-								// sendDataToSpecificClient(conn, generateStandardWebsocketMsg("查询到已采用中转方案，正在获取中转信息", messageKey))
-							}
-						}
-					}
-
-				} else {
-					logger.Error("event 的值不是字符串类型")
-				}
-			} else {
-				logger.Error("event 键不存在")
+		switch messageType {
+		case websocket.TextMessage:
+			messageText := string(message)
+			logger.Info("message Text", logger.Any("message", messageText))
+			var contentBody ContentBody
+			err := json.Unmarshal([]byte(messageText), &contentBody)
+			if err != nil {
+				logger.Error("ParseTextToJSON error", logger.Err(err), logger.String("origin message is", messageText))
+				continue
 			}
-		} else {
-			logger.Error("解析结果不是预期的 map 类型")
+
+			switch contentBody.ContentType {
+			case Ping:
+				clientLastHeartbeat[contentBody.SenderID] = time.Now()
+				logger.Info("收到心跳包", logger.Any("sender", contentBody.SenderID), logger.Any("remoteAddr", conn.RemoteAddr().String()))
+				mutex.Lock()
+				connectionMap[contentBody.SenderID] = ConnectionInfo{
+					Conn:              conn,
+					RemoteAddr:        remoteAddr,
+					LastHeartbeatTime: time.Now(),
+				}
+				mutex.Unlock()
+				message := createMessage(Pong, nil, contentBody.SenderID, contentBody.ClientMsgID)
+				err = conn.WriteMessage(messageType, message)
+				if err != nil {
+					logger.Warn("WriteMessage error", logger.Err(err))
+					continue
+				}
+			case Call, Answer, EndCall:
+				if err := handleMessageSend(conn, messageType, contentBody, contentBody.ContentType); err != nil {
+					continue
+				}
+			case SendSMS:
+				if err := handleMessageSend(conn, messageType, contentBody, contentBody.ContentType); err != nil {
+					continue
+				}
+			case Idle, Income, NewSMS:
+				groupOwnerID, err := getGroupOwnerID(ctx, w, contentBody.SenderID)
+				if err != nil {
+					continue
+				}
+				logger.Info("收到话机主动上报的数据", logger.Any("sender", contentBody.SenderID), logger.Any("remoteAddr", conn.RemoteAddr().String()), logger.Any("groupOwnerID", groupOwnerID))
+				var newContentBody ContentBody
+				if contentBody.ContentType == NewSMS {
+					content := make(map[string]interface{})
+					content["address"] = contentBody.Content
+					content["body"] = contentBody.ReceiveID
+					newContentBody = ContentBody{
+						ContentType: NewSMS,
+						Content:     content,
+						SenderID:    contentBody.SenderID,
+						ReceiveID:   groupOwnerID,
+						ClientMsgID: contentBody.ClientMsgID,
+					}
+				} else {
+					newContentBody = ContentBody{
+						ContentType: contentBody.ContentType,
+						Content:     contentBody.Content,
+						SenderID:    contentBody.SenderID,
+						ReceiveID:   groupOwnerID,
+						ClientMsgID: contentBody.ClientMsgID,
+					}
+				}
+				sendMessageToUser(conn, newContentBody)
+			}
+		default:
+			logger.Warnf("Unknown message type: %d", messageType)
 		}
-		logger.Info("websocket", logger.String("messageStr", messageStr), logger.String("remoteAddr", remoteAddr))
 	}
-	close(done)
 }
 
 func (w websocketHandler) GetOnlineClients(c *gin.Context) {
-	res := make(map[string]string)
-	for key, value := range clients {
-		ipAddr := value.RemoteAddr().String()
-		res[key] = ipAddr
+	mutex.Lock()
+	connectionInfoCopy := make(map[string]ConnectionInfo)
+	for key, value := range connectionMap {
+		connectionInfoCopy[key] = ConnectionInfo{
+			RemoteAddr:        value.RemoteAddr,
+			LastHeartbeatTime: value.LastHeartbeatTime,
+		}
 	}
+	mutex.Unlock()
+
 	response.Success(c, gin.H{
-		"results": res,
-		"count":   len(res),
+		"results": connectionInfoCopy,
+		"count":   len(connectionInfoCopy),
 	})
 }
 
-func sendDataToSpecificClient(conn *ws.Conn, message []byte) error {
-	if conn != nil {
-		logger.Infof("开始给客户端发送消息", logger.Any("设备ID", conn.RemoteAddr().String()))
-		if err := writeMessageWithLogging(conn, websocket.TextMessage, message); err != nil {
-			return err
-		}
-		time.Sleep(500 * time.Millisecond) // 暂停一段时间，可能为了防止消息发送过快
-		return nil
+func GenerateRandomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var sb strings.Builder
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < length; i++ {
+		index := rand.Intn(len(charset))
+		sb.WriteByte(charset[index])
 	}
-	return nil
+	return sb.String()
 }
 
-func generateServerWebsocketMsg(message, key string) []byte {
-	msg := fmt.Sprintf(`{"event":"receive","message":"%s","data":"","key":"%s","type":"server"}`, message, key)
-	return []byte(msg)
+func createMessage(message_type ContentType, content interface{}, receiveID string, msgID string) []byte {
+	if msgID == "" {
+		msgID = GenerateRandomString(6)
+	}
+	original := ContentBody{
+		ContentType: message_type,
+		Content:     content,
+		SenderID:    "server",
+		ReceiveID:   receiveID,
+		ClientMsgID: msgID,
+	}
+	jsonData, err := json.Marshal(original)
+	if err != nil {
+		logger.Error("JSON 编码出错", logger.Err(err))
+		return []byte("error")
+	}
+	return jsonData
 }
 
-func generateStandardWebsocketMsg(event, message, data, key string) []byte {
+func sendMessageToUser(conn *ws.Conn, contentBody ContentBody) error {
+	logger.Infof("正在给 %s 发送 %s", contentBody.ReceiveID, contentBody.Content)
+	mutex.Lock()
+	info, exists := connectionMap[contentBody.ReceiveID]
+	mutex.Unlock()
+	if !exists {
+		logger.Errorf("用户未找到", logger.Any("设备ID", contentBody.ReceiveID))
+		return errors.New("用户未找到")
+	}
+	message, err := json.Marshal(contentBody)
+	if err != nil {
+		logger.Error("JSON 编码出错", logger.Err(err))
+		return errors.New("JSON 编码出错")
+	}
 
-	msg := fmt.Sprintf(`{"event":"%s","message":"%s","data":"%s","key":"%s","type":"server"}`, event, message, data, key)
-	return []byte(msg)
-}
-func writeMessageWithLogging(conn *ws.Conn, messageType int, message []byte) error {
-	if conn != nil {
-		err := conn.WriteMessage(messageType, message)
+	if info.Conn != nil {
+		err := info.Conn.WriteMessage(websocket.TextMessage, message)
 		if err != nil {
-			logger.Error("向客户端发送数据出错", logger.Err(err), logger.String("message", string(message)), logger.String("to", conn.RemoteAddr().String()))
-			// 尝试关闭连接，忽略关闭连接时可能出现的错误
-			_ = conn.Close()
-			return err
+			logger.Infof("给用户 %s 发送消息失败: %v", contentBody.ReceiveID, err)
+			return errors.New("给用户发送消息失败")
 		}
-	} else {
-		logger.Error("接收设备不在线")
-		return errors.New("device received is offline, the message has been aborted")
+		logger.Infof("给用户 %s 发送消息成功: %s", contentBody.ReceiveID, string(message))
+		message := createMessage(SendSuccess, contentBody.ContentType, contentBody.ReceiveID, contentBody.ClientMsgID)
+		return conn.WriteMessage(websocket.TextMessage, message)
 	}
-	return nil
-}
-
-func (w websocketHandler) ReadOfflineMessage(c *gin.Context) {
-	userID := c.Param("user_id")
-	setOfflineMsgUnread(c, userID, "false")
-	response.Success(c, gin.H{
-		"status": "ok",
-	})
+	logger.Infof("用户不存在", logger.Any("设备ID", contentBody.ReceiveID))
+	return errors.New("用户不存在")
 }

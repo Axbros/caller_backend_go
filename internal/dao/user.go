@@ -39,6 +39,8 @@ type UserDao interface {
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.User) error
 	GetUserByClientMachineCode(ctx context.Context, clientMachineCode string) (*model.User, error)
 	GetUserIdByUserMachineCode(ctx context.Context, machine_code string) (*model.User, error)
+	GetGroupNameByUserID(ctx context.Context, userID uint64) (*model.Distribution, error)
+	GetGroupMembersByGroupName(ctx context.Context, groupName string) ([]*model.GroupClient, error)
 }
 
 type userDao struct {
@@ -435,6 +437,25 @@ func (d *userDao) GetUserIdByUserMachineCode(ctx context.Context, machine_code s
 	err := d.db.WithContext(ctx).Table("user").Where("user.machine_code = ?", machine_code).Select("user.*").Find(&record).Error
 	if err != nil {
 		logger.Error("getUserIdByUserMachineCode", logger.Err(err), logger.String("machine code", machine_code))
+	}
+	return record, err
+}
+
+func (d *userDao) GetGroupNameByUserID(ctx context.Context, userID uint64) (*model.Distribution, error) {
+	var record *model.Distribution
+	err := d.db.WithContext(ctx).Table("distribution").Where("distribution.user_id = ?", userID).Find(&record).Error
+	if err != nil {
+		logger.Error("GetClientsByUserID", logger.Err(err), logger.Any("userID ", userID))
+	}
+	return record, err
+}
+
+// GetGroupMembersByGroupName 获取组内成员
+func (d *userDao) GetGroupMembersByGroupName(ctx context.Context, groupName string) ([]*model.GroupClient, error) {
+	var record []*model.GroupClient
+	err := d.db.WithContext(ctx).Table("group_client").Where("group_client.group_name = ?", groupName).Find(&record).Error
+	if err != nil {
+		return nil, err
 	}
 	return record, err
 }

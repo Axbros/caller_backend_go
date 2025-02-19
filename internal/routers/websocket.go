@@ -11,12 +11,13 @@ import (
 
 func init() {
 	websocketRouterFns = append(websocketRouterFns, func(group *gin.RouterGroup) {
-		websocketRouter(group, handler.NewWebsocketHandler())
+		wsHandler := handler.NewWebsocketHandler()
+		websocketRouter(group, wsHandler)
+		wsHandler.CheckHeartBeat()
 	})
 }
 
 func websocketRouter(group *gin.RouterGroup, h handler.WebsocketHandler) {
-
 	group.GET("/", func(c *gin.Context) {
 		{
 			s := ws.NewServer(c.Writer, c.Request, h.LoopReceiveMessage) // default setting

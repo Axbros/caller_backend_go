@@ -38,6 +38,9 @@ type DistributionDao interface {
 	UpdateByTx(ctx context.Context, tx *gorm.DB, table *model.Distribution) error
 
 	GetDistributedGroupNameByUserId(ctx context.Context, userId string) (GroupName string)
+
+	CheckIfUserExistByUserID(ctx context.Context, userID uint64) bool
+	CreateOrUpdate(ctx context.Context, groupName string, userID uint64) error
 }
 
 type distributionDao struct {
@@ -395,4 +398,34 @@ func (d *distributionDao) GetDistributedGroupNameByUserId(ctx context.Context, u
 
 	}
 	return record.GroupName
+}
+
+func (d *distributionDao) CheckIfUserExistByUserID(ctx context.Context, userId uint64) bool {
+	record := &model.User{}
+	isExist := d.db.WithContext(ctx).Where("id =?", userId).First(record)
+	if isExist.RowsAffected > 0 {
+		return true
+		// return response.Error(c, ecode.ErrCreateGroupClient)
+	} else {
+		return false
+	}
+}
+
+func (d *distributionDao) CreateOrUpdate(ctx context.Context, groupName string, userID uint64) error {
+	record := &model.Distribution{}
+	isExist := d.db.WithContext(ctx).Where("group_name = ?", groupName).First(record)
+	if isExist.RowsAffected > 0 {
+		//如果有數據就更新
+		record.UserID = int(userID)
+		return d.updateDataByID(ctx, d.db, record)
+		// return true
+		// return response.Error(c, ecode.ErrCreateGroupClient)
+	} else {
+		newRecord := &model.Distribution{
+			UserID:    int(userID),
+			GroupName: groupName,
+		}
+		return d.Create(ctx, newRecord)
+		// return false
+	}
 }

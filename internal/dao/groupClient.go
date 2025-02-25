@@ -40,6 +40,9 @@ type GroupClientDao interface {
 	GetGroupNameAndClientIDs(ctx context.Context) ([]*model.GroupClient, error)
 	GetGroupNameByClientID(ctx context.Context, clientID string) (string, error)
 	GetGroupOwnerIDByClientID(ctx context.Context, clientID string) (string, error)
+	GetGroupInfoByGroupName(ctx context.Context, groupname string) ([]*model.GroupClient, int, error)
+	CheckIfClientExistByClientID(ctx context.Context, clientID int) bool
+	GetParentsByClientID(ctx context.Context, clientID string) ([]*model.GroupClient, error)
 }
 
 type groupClientDao struct {
@@ -417,4 +420,41 @@ func (d *groupClientDao) GetGroupOwnerIDByClientID(ctx context.Context, clientID
 		return "", err
 	}
 	return strconv.Itoa(DistributionRecord.UserID), nil
+}
+
+func (d *groupClientDao) GetGroupInfoByGroupName(ctx context.Context, groupname string) ([]*model.GroupClient, int, error) {
+	var record []*model.GroupClient
+	var distributionRecord model.Distribution
+
+	err := d.db.WithContext(ctx).Where("group_name = ?", groupname).Find(&record).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	err = d.db.Model(&model.Distribution{}).Where("group_name = ?", groupname).Find(&distributionRecord).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return record, distributionRecord.UserID, nil
+}
+
+func (d *groupClientDao) CheckIfClientExistByClientID(ctx context.Context, clientID int) bool {
+	record := &model.Clients{}
+	isExist := d.db.WithContext(ctx).Where("id = ?", clientID).First(record)
+	if isExist.RowsAffected > 0 {
+		return true
+		// return response.Error(c, ecode.ErrCreateGroupClient)
+	} else {
+		return false
+	}
+}
+
+func (d *groupClientDao) GetParentsByClientID(ctx context.Context, clientID string) ([]*model.GroupClient, error) {
+	var records []*model.GroupClient
+
+	err := d.db.WithContext(ctx).Where("client_id = ?", clientID).Find(&records).Error
+	if err != nil {
+		return nil, err
+	} else {
+		return records, nil
+	}
 }

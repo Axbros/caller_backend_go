@@ -33,6 +33,7 @@ type DistributionHandler interface {
 	GetByCondition(c *gin.Context)
 	ListByIDs(c *gin.Context)
 	ListByLastID(c *gin.Context)
+	SetUserByGroupName(c *gin.Context)
 }
 
 type distributionHandler struct {
@@ -408,6 +409,37 @@ func (h *distributionHandler) ListByLastID(c *gin.Context) {
 	})
 }
 
+func (h *distributionHandler) SetUserByGroupName(c *gin.Context) {
+	form := &types.SetUserByGroupName{}
+	err := c.ShouldBindJSON(form)
+	if err != nil {
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
+		response.Error(c, ecode.InvalidParams)
+		return
+	}
+	//去user表檢測用戶傳遞過來的userid是否存在
+	isExist := h.iDao.CheckIfUserExistByUserID(c, form.UserId)
+	if !isExist {
+		response.Error(c, ecode.ErrSetUserByGroupNameUserNotFound)
+		return
+	}
+	//如果存在就更新或者添加
+	err = h.iDao.CreateOrUpdate(c, form.GroupName, form.UserId)
+	if err != nil {
+		response.Error(c, ecode.ErrCreateOrUpdate)
+		return
+	}
+
+	response.Success(c, gin.H{
+		"user_id":    form.UserId,
+		"group_name": form.GroupName,
+	})
+}
+
+func getClientIdFromPath(c *gin.Context) string {
+	clientid := c.Param("clientid")
+	return clientid
+}
 func getDistributionIDFromPath(c *gin.Context) (string, uint64, bool) {
 	idStr := c.Param("id")
 	id, err := utils.StrToUint64E(idStr)

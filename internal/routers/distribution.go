@@ -26,4 +26,6 @@ func distributionRouter(group *gin.RouterGroup, h handler.DistributionHandler) {
 	group.POST("/distribution/condition", h.GetByCondition)
 	group.POST("/distribution/list/ids", h.ListByIDs)
 	group.GET("/distribution/list", h.ListByLastID)
+	group.POST("/distribution/setUserByGroupName", h.SetUserByGroupName)
+
 }

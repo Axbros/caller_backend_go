@@ -60,8 +60,8 @@ definitions:
     type: object
   types.CreateDistributionRequest:
     properties:
-      groupCallId:
-        type: integer
+      groupName:
+        type: string
       userId:
         type: integer
     type: object
@@ -81,93 +81,14 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.CreateGroupCallRequest:
-    properties:
-      groupNumber:
-        type: string
-      phoneNumber:
-        type: string
-      transferClientId:
-        type: string
-    type: object
-  types.CreateGroupCallRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          id:
-            description: id
-            type: integer
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
   types.CreateGroupClientRequest:
     properties:
       clientId:
         type: integer
-      groupId:
-        type: integer
+      groupName:
+        type: string
     type: object
   types.CreateGroupClientRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          id:
-            description: id
-            type: integer
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.CreateSmsRequest:
-    properties:
-      address:
-        type: string
-      body:
-        type: string
-      date:
-        type: string
-      from:
-        type: string
-      machineCode:
-        type: string
-      smsType:
-        type: string
-    type: object
-  types.CreateSmsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          id:
-            description: id
-            type: integer
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.CreateUnanswerdCallRequest:
-    properties:
-      clientMachineCode:
-        type: string
-      mobileNumber:
-        type: string
-    type: object
-  types.CreateUnanswerdCallRespond:
     properties:
       code:
         description: return code
@@ -266,37 +187,6 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.DeleteGroupCallByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.DeleteGroupCallsByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.DeleteGroupCallsByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
   types.DeleteGroupClientByIDRespond:
     properties:
       code:
@@ -318,68 +208,6 @@ definitions:
         type: array
     type: object
   types.DeleteGroupClientsByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.DeleteSmsByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.DeleteSmssByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.DeleteSmssByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.DeleteUnanswerdCallByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.DeleteUnanswerdCallsByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.DeleteUnanswerdCallsByIDsRespond:
     properties:
       code:
         description: return code
@@ -425,8 +253,8 @@ definitions:
     properties:
       createdAt:
         type: string
-      groupCallId:
-        type: integer
+      groupName:
+        type: string
       id:
         description: convert to string id
         type: string
@@ -495,36 +323,6 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.GetGroupCallByConditionRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          groupCall:
-            $ref: '#/definitions/types.GroupCallObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.GetGroupCallByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          groupCall:
-            $ref: '#/definitions/types.GroupCallObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
   types.GetGroupClientByConditionRespond:
     properties:
       code:
@@ -550,66 +348,6 @@ definitions:
         properties:
           groupClient:
             $ref: '#/definitions/types.GroupClientObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.GetSmsByConditionRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          sms:
-            $ref: '#/definitions/types.SmsObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.GetSmsByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          sms:
-            $ref: '#/definitions/types.SmsObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.GetUnanswerdCallByConditionRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          callLog:
-            $ref: '#/definitions/types.UnanswerdCallObjDetail'
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.GetUnanswerdCallByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          callLog:
-            $ref: '#/definitions/types.UnanswerdCallObjDetail'
         type: object
       msg:
         description: return information description
@@ -645,30 +383,14 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.GroupCallObjDetail:
-    properties:
-      createdAt:
-        type: string
-      groupNumber:
-        type: string
-      id:
-        description: convert to string id
-        type: string
-      phoneNumber:
-        type: string
-      transferClientId:
-        type: string
-      updatedAt:
-        type: string
-    type: object
   types.GroupClientObjDetail:
     properties:
       clientId:
         type: integer
       createdAt:
         type: string
-      groupId:
-        type: integer
+      groupName:
+        type: string
       id:
         description: convert to string id
         type: string
@@ -761,49 +483,6 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.ListGroupCallsByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.ListGroupCallsByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          groupCalls:
-            items:
-              $ref: '#/definitions/types.GroupCallObjDetail'
-            type: array
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.ListGroupCallsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          groupCalls:
-            items:
-              $ref: '#/definitions/types.GroupCallObjDetail'
-            type: array
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
   types.ListGroupClientsByIDsRequest:
     properties:
       ids:
@@ -841,92 +520,6 @@ definitions:
           groupClients:
             items:
               $ref: '#/definitions/types.GroupClientObjDetail'
-            type: array
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.ListSmssByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.ListSmssByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          smss:
-            items:
-              $ref: '#/definitions/types.SmsObjDetail'
-            type: array
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.ListSmssRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          smss:
-            items:
-              $ref: '#/definitions/types.SmsObjDetail'
-            type: array
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.ListUnanswerdCallsByIDsRequest:
-    properties:
-      ids:
-        description: id list
-        items:
-          type: integer
-        minItems: 1
-        type: array
-    type: object
-  types.ListUnanswerdCallsByIDsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          callLogs:
-            items:
-              $ref: '#/definitions/types.UnanswerdCallObjDetail'
-            type: array
-        type: object
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.ListUnanswerdCallsRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-        properties:
-          callLogs:
-            items:
-              $ref: '#/definitions/types.UnanswerdCallObjDetail'
             type: array
         type: object
       msg:
@@ -993,40 +586,6 @@ definitions:
         description: sorted fields, multi-column sorting separated by commas
         type: string
     type: object
-  types.SmsObjDetail:
-    properties:
-      address:
-        type: string
-      body:
-        type: string
-      createdAt:
-        type: string
-      date:
-        type: string
-      id:
-        description: convert to string id
-        type: string
-      machineCode:
-        type: string
-      smsType:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  types.UnanswerdCallObjDetail:
-    properties:
-      clientMachineCode:
-        type: string
-      createdAt:
-        type: string
-      id:
-        description: convert to string id
-        type: string
-      mobileNumber:
-        type: string
-      updatedAt:
-        type: string
-    type: object
   types.UpdateClientsByIDRequest:
     properties:
       id:
@@ -1050,8 +609,8 @@ definitions:
     type: object
   types.UpdateDistributionByIDRequest:
     properties:
-      groupCallId:
-        type: integer
+      groupName:
+        type: string
       id:
         description: uint64 id
         type: integer
@@ -1069,88 +628,17 @@ definitions:
         description: return information description
         type: string
     type: object
-  types.UpdateGroupCallByIDRequest:
-    properties:
-      groupNumber:
-        type: string
-      id:
-        description: uint64 id
-        type: integer
-      phoneNumber:
-        type: string
-      transferClientId:
-        type: string
-    type: object
-  types.UpdateGroupCallByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
   types.UpdateGroupClientByIDRequest:
     properties:
       clientId:
         type: integer
-      groupId:
-        type: integer
+      groupName:
+        type: string
       id:
         description: uint64 id
         type: integer
     type: object
   types.UpdateGroupClientByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.UpdateSmsByIDRequest:
-    properties:
-      address:
-        type: string
-      body:
-        type: string
-      date:
-        type: string
-      id:
-        description: uint64 id
-        type: integer
-      machineCode:
-        type: string
-      smsType:
-        type: string
-    type: object
-  types.UpdateSmsByIDRespond:
-    properties:
-      code:
-        description: return code
-        type: integer
-      data:
-        description: return data
-      msg:
-        description: return information description
-        type: string
-    type: object
-  types.UpdateUnanswerdCallByIDRequest:
-    properties:
-      clientMachineCode:
-        type: string
-      id:
-        description: uint64 id
-        type: integer
-      mobileNumber:
-        type: string
-    type: object
-  types.UpdateUnanswerdCallByIDRespond:
     properties:
       code:
         description: return code
@@ -1199,232 +687,6 @@ info:
   title: caller api docs
   version: "2.0"
 paths:
-  /api/v1/callLog:
-    post:
-      consumes:
-      - application/json
-      description: submit information to create callLog
-      parameters:
-      - description: callLog information
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.CreateUnanswerdCallRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.CreateUnanswerdCallRespond'
-      security:
-      - BearerAuth: []
-      summary: create callLog
-      tags:
-      - callLog
-  /api/v1/callLog/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: delete callLog by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteUnanswerdCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: delete callLog
-      tags:
-      - callLog
-    get:
-      consumes:
-      - application/json
-      description: get callLog detail by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetUnanswerdCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: get callLog detail
-      tags:
-      - callLog
-    put:
-      consumes:
-      - application/json
-      description: update callLog information by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: callLog information
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateUnanswerdCallByIDRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.UpdateUnanswerdCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: update callLog
-      tags:
-      - callLog
-  /api/v1/callLog/condition:
-    post:
-      consumes:
-      - application/json
-      description: get callLog by condition
-      parameters:
-      - description: query condition
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Conditions'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetUnanswerdCallByConditionRespond'
-      security:
-      - BearerAuth: []
-      summary: get callLog by condition
-      tags:
-      - callLog
-  /api/v1/callLog/delete/ids:
-    post:
-      consumes:
-      - application/json
-      description: delete callLogs by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.DeleteUnanswerdCallsByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteUnanswerdCallsByIDsRespond'
-      security:
-      - BearerAuth: []
-      summary: delete callLogs
-      tags:
-      - callLog
-  /api/v1/callLog/list:
-    get:
-      consumes:
-      - application/json
-      description: list of callLogs by last id and limit
-      parameters:
-      - default: 0
-        description: last id, default is MaxInt32
-        in: query
-        name: lastID
-        required: true
-        type: integer
-      - default: 10
-        description: size in each page
-        in: query
-        name: limit
-        type: integer
-      - default: -id
-        description: 'sort by column name of table, and the '
-        in: query
-        name: sort
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListUnanswerdCallsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of callLogs by last id and limit
-      tags:
-      - callLog
-    post:
-      consumes:
-      - application/json
-      description: list of callLogs by paging and conditions
-      parameters:
-      - description: query parameters
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Params'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListUnanswerdCallsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of callLogs by query parameters
-      tags:
-      - callLog
-  /api/v1/callLog/list/ids:
-    post:
-      consumes:
-      - application/json
-      description: list of callLogs by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.ListUnanswerdCallsByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListUnanswerdCallsByIDsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of callLogs by batch id
-      tags:
-      - callLog
   /api/v1/clients:
     post:
       consumes:
@@ -1877,232 +1139,6 @@ paths:
       summary: list of distributions by batch id
       tags:
       - distribution
-  /api/v1/groupCall:
-    post:
-      consumes:
-      - application/json
-      description: submit information to create groupCall
-      parameters:
-      - description: groupCall information
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.CreateGroupCallRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.CreateGroupCallRespond'
-      security:
-      - BearerAuth: []
-      summary: create groupCall
-      tags:
-      - groupCall
-  /api/v1/groupCall/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: delete groupCall by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteGroupCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: delete groupCall
-      tags:
-      - groupCall
-    get:
-      consumes:
-      - application/json
-      description: get groupCall detail by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetGroupCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: get groupCall detail
-      tags:
-      - groupCall
-    put:
-      consumes:
-      - application/json
-      description: update groupCall information by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: groupCall information
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateGroupCallByIDRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.UpdateGroupCallByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: update groupCall
-      tags:
-      - groupCall
-  /api/v1/groupCall/condition:
-    post:
-      consumes:
-      - application/json
-      description: get groupCall by condition
-      parameters:
-      - description: query condition
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Conditions'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetGroupCallByConditionRespond'
-      security:
-      - BearerAuth: []
-      summary: get groupCall by condition
-      tags:
-      - groupCall
-  /api/v1/groupCall/delete/ids:
-    post:
-      consumes:
-      - application/json
-      description: delete groupCalls by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.DeleteGroupCallsByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteGroupCallsByIDsRespond'
-      security:
-      - BearerAuth: []
-      summary: delete groupCalls
-      tags:
-      - groupCall
-  /api/v1/groupCall/list:
-    get:
-      consumes:
-      - application/json
-      description: list of groupCalls by last id and limit
-      parameters:
-      - default: 0
-        description: last id, default is MaxInt32
-        in: query
-        name: lastID
-        required: true
-        type: integer
-      - default: 10
-        description: size in each page
-        in: query
-        name: limit
-        type: integer
-      - default: -id
-        description: 'sort by column name of table, and the '
-        in: query
-        name: sort
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListGroupCallsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of groupCalls by last id and limit
-      tags:
-      - groupCall
-    post:
-      consumes:
-      - application/json
-      description: list of groupCalls by paging and conditions
-      parameters:
-      - description: query parameters
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Params'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListGroupCallsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of groupCalls by query parameters
-      tags:
-      - groupCall
-  /api/v1/groupCall/list/ids:
-    post:
-      consumes:
-      - application/json
-      description: list of groupCalls by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.ListGroupCallsByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListGroupCallsByIDsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of groupCalls by batch id
-      tags:
-      - groupCall
   /api/v1/groupClient:
     post:
       consumes:
@@ -2329,232 +1365,6 @@ paths:
       summary: list of groupClients by batch id
       tags:
       - groupClient
-  /api/v1/sms:
-    post:
-      consumes:
-      - application/json
-      description: submit information to create sms
-      parameters:
-      - description: sms information
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.CreateSmsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.CreateSmsRespond'
-      security:
-      - BearerAuth: []
-      summary: create sms
-      tags:
-      - sms
-  /api/v1/sms/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: delete sms by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteSmsByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: delete sms
-      tags:
-      - sms
-    get:
-      consumes:
-      - application/json
-      description: get sms detail by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetSmsByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: get sms detail
-      tags:
-      - sms
-    put:
-      consumes:
-      - application/json
-      description: update sms information by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: sms information
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.UpdateSmsByIDRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.UpdateSmsByIDRespond'
-      security:
-      - BearerAuth: []
-      summary: update sms
-      tags:
-      - sms
-  /api/v1/sms/condition:
-    post:
-      consumes:
-      - application/json
-      description: get sms by condition
-      parameters:
-      - description: query condition
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Conditions'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.GetSmsByConditionRespond'
-      security:
-      - BearerAuth: []
-      summary: get sms by condition
-      tags:
-      - sms
-  /api/v1/sms/delete/ids:
-    post:
-      consumes:
-      - application/json
-      description: delete smss by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.DeleteSmssByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.DeleteSmssByIDsRespond'
-      security:
-      - BearerAuth: []
-      summary: delete smss
-      tags:
-      - sms
-  /api/v1/sms/list:
-    get:
-      consumes:
-      - application/json
-      description: list of smss by last id and limit
-      parameters:
-      - default: 0
-        description: last id, default is MaxInt32
-        in: query
-        name: lastID
-        required: true
-        type: integer
-      - default: 10
-        description: size in each page
-        in: query
-        name: limit
-        type: integer
-      - default: -id
-        description: 'sort by column name of table, and the '
-        in: query
-        name: sort
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListSmssRespond'
-      security:
-      - BearerAuth: []
-      summary: list of smss by last id and limit
-      tags:
-      - sms
-    post:
-      consumes:
-      - application/json
-      description: list of smss by paging and conditions
-      parameters:
-      - description: query parameters
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.Params'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListSmssRespond'
-      security:
-      - BearerAuth: []
-      summary: list of smss by query parameters
-      tags:
-      - sms
-  /api/v1/sms/list/ids:
-    post:
-      consumes:
-      - application/json
-      description: list of smss by batch id
-      parameters:
-      - description: id array
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/types.ListSmssByIDsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.ListSmssByIDsRespond'
-      security:
-      - BearerAuth: []
-      summary: list of smss by batch id
-      tags:
-      - sms
   /api/v1/user:
     post:
       consumes:

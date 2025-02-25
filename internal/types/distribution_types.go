@@ -12,26 +12,26 @@ var _ time.Time
 
 // CreateDistributionRequest request params
 type CreateDistributionRequest struct {
-	UserID      int `json:"userId" binding:""`
-	GroupCallID int `json:"groupCallId" binding:""`
+	UserID    int    `json:"userId" binding:""`
+	GroupName string `json:"groupName" binding:""`
 }
 
 // UpdateDistributionByIDRequest request params
 type UpdateDistributionByIDRequest struct {
 	ID uint64 `json:"id" binding:""` // uint64 id
 
-	UserID      int `json:"userId" binding:""`
-	GroupCallID int `json:"groupCallId" binding:""`
+	UserID    int    `json:"userId" binding:""`
+	GroupName string `json:"groupName" binding:""`
 }
 
 // DistributionObjDetail detail
 type DistributionObjDetail struct {
 	ID string `json:"id"` // convert to string id
 
-	UserID      int       `json:"userId"`
-	GroupCallID int       `json:"groupCallId"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	UserID    int       `json:"userId"`
+	GroupName string    `json:"groupName"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // CreateDistributionRespond only for api docs
@@ -103,6 +103,11 @@ type GetDistributionByConditionRespond struct {
 // ListDistributionsByIDsRequest request params
 type ListDistributionsByIDsRequest struct {
 	IDs []uint64 `json:"ids" binding:"min=1"` // id list
+}
+
+type SetUserByGroupName struct {
+	GroupName string `json:"groupname"`
+	UserId    uint64 `json:"userId"`
 }
 
 // ListDistributionsByIDsRespond only for api docs

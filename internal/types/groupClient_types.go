@@ -12,23 +12,28 @@ var _ time.Time
 
 // CreateGroupClientRequest request params
 type CreateGroupClientRequest struct {
-	GroupID  int `json:"groupId" binding:""`
-	ClientID int `json:"clientId" binding:""`
+	GroupName string `json:"groupName" binding:""`
+	ClientID  int    `json:"clientId" binding:""`
+}
+
+type AddClientByGroupName struct {
+	GroupName string `json:"group_name" binding:""`
+	ClientID  int    `json:"client_id" binding:""`
 }
 
 // UpdateGroupClientByIDRequest request params
 type UpdateGroupClientByIDRequest struct {
 	ID uint64 `json:"id" binding:""` // uint64 id
 
-	GroupID  int `json:"groupId" binding:""`
-	ClientID int `json:"clientId" binding:""`
+	GroupName string `json:"groupName" binding:""`
+	ClientID  int    `json:"clientId" binding:""`
 }
 
 // GroupClientObjDetail detail
 type GroupClientObjDetail struct {
 	ID string `json:"id"` // convert to string id
 
-	GroupID   int       `json:"groupId"`
+	GroupName string    `json:"groupName"`
 	ClientID  int       `json:"clientId"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`

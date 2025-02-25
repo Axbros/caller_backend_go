@@ -28,4 +28,8 @@ func groupClientRouter(group *gin.RouterGroup, h handler.GroupClientHandler) {
 	group.GET("/groupClient/list", h.ListByLastID)
 
 	group.GET("/groupClient/updateRedis", h.UpdateRedis)
+	group.GET("/group/byname/:groupname", h.GetGroupInfoByGroupName)
+	group.POST("/group/addClientByGroupName", h.AddClientByGroupName)
+
+	group.GET("/group/getclientparent/:clientid", h.GetClientParent)
 }

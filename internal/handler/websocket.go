@@ -104,7 +104,6 @@ func startHeartbeatCheck(done chan struct{}) {
 						rwMu.RUnlock()
 						rwMu.Lock()
 						fmt.Printf("客户端 %s 可能断网\n", deviceID)
-
 						delete(connectionMap, deviceID)
 						delete(clientLastHeartbeat, deviceID)
 						rwMu.Unlock()

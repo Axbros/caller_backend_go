@@ -34,6 +34,9 @@ type GroupClientHandler interface {
 	ListByIDs(c *gin.Context)
 	ListByLastID(c *gin.Context)
 	UpdateRedis(c *gin.Context)
+	GetGroupInfoByGroupName(c *gin.Context)
+	AddClientByGroupName(c *gin.Context)
+	GetClientParent(c *gin.Context)
 }
 
 type groupClientHandler struct {
@@ -444,6 +447,11 @@ func getGroupClientIDFromPath(c *gin.Context) (string, uint64, bool) {
 	return idStr, id, false
 }
 
+func getGroupNameFromPath(c *gin.Context) string {
+	groupname := c.Param("groupname")
+	return groupname
+}
+
 func convertGroupClient(groupClient *model.GroupClient) (*types.GroupClientObjDetail, error) {
 	data := &types.GroupClientObjDetail{}
 	err := copier.Copy(data, groupClient)
@@ -466,4 +474,69 @@ func convertGroupClients(fromValues []*model.GroupClient) ([]*types.GroupClientO
 	}
 
 	return toValues, nil
+}
+
+func (h *groupClientHandler) GetGroupInfoByGroupName(c *gin.Context) {
+	groupName := getGroupNameFromPath(c)
+	ctx := middleware.WrapCtx(c)
+	clientIds, userid, err := h.iDao.GetGroupInfoByGroupName(ctx, groupName)
+	if err != nil {
+		logger.Error("GetGroupInfoByGroupName error", logger.Err(err), logger.Any("groupname", groupName), middleware.GCtxRequestIDField(c))
+		response.Output(c, ecode.InternalServerError.ToHTTPCode())
+		return
+	}
+	response.Success(c, gin.H{
+		"total":   len(clientIds),
+		"clients": clientIds,
+		"user":    userid,
+	})
+
+}
+
+func (h *groupClientHandler) AddClientByGroupName(c *gin.Context) {
+	form := &types.AddClientByGroupName{}
+	err := c.ShouldBindJSON(form)
+	if err != nil {
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
+		response.Error(c, ecode.InvalidParams)
+		return
+	}
+	isExist := h.iDao.CheckIfClientExistByClientID(c, form.ClientID)
+	if !isExist {
+		response.Error(c, ecode.ErrClientIDNotFound)
+		return
+	}
+	newRecord := &model.GroupClient{
+		GroupName: form.GroupName,
+		ClientID:  form.ClientID,
+	}
+	err = h.iDao.Create(c, newRecord)
+	if err != nil {
+		response.Error(c, ecode.ErrCreateDistribution)
+		return
+	}
+	response.Success(c, gin.H{
+		"id":         newRecord.ID,
+		"group_name": form.GroupName,
+	})
+
+}
+
+func (h *groupClientHandler) GetClientParent(c *gin.Context) {
+	clientid := getClientIdFromPath(c)
+	records, err := h.iDao.GetParentsByClientID(c, clientid)
+	var groups []string
+	if err != nil {
+		response.Error(c, ecode.ErrGetParent)
+		return
+	}
+	for _, v := range records {
+		groups = append(groups, v.GroupName)
+	}
+	response.Success(c, gin.H{
+		"client_id":    clientid,
+		"total_group":  len(records),
+		"joined_group": groups,
+	})
+
 }

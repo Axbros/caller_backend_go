@@ -32,6 +32,7 @@ type DistributionHandler interface {
 	DeleteByIDs(c *gin.Context)
 	GetByCondition(c *gin.Context)
 	ListByIDs(c *gin.Context)
+	ActiveByID(c *gin.Context)
 	ListByLastID(c *gin.Context)
 	SetUserByGroupName(c *gin.Context)
 }
@@ -320,7 +321,30 @@ func (h *distributionHandler) GetByCondition(c *gin.Context) {
 	// Note: if copier.Copy cannot assign a value to a field, add it here
 	data.ID = utils.Uint64ToStr(distribution.ID)
 
+	//判断deleteAt是否为初始时间 0001-01-01T00:00:00Z
+	if data.DeletedAt.IsZero() {
+		data.IsActive = true
+	} else {
+		data.IsActive = false
+	}
+
 	response.Success(c, gin.H{"distribution": data})
+}
+
+func (h *distributionHandler) ActiveByID(c *gin.Context) {
+	form := &types.ActiveByIDRequest{}
+	err := c.ShouldBindJSON(form)
+	if err != nil {
+		logger.Warn("ShouldBindJSON error: ", logger.Err(err), middleware.GCtxRequestIDField(c))
+		response.Error(c, ecode.InvalidParams)
+		return
+	}
+	err = h.iDao.ActiveByID(c, form.ID)
+	if err != nil {
+		response.Error(c, ecode.ErrActiveByID)
+		return
+	}
+	response.Success(c, gin.H{})
 }
 
 // ListByIDs list of records by batch id

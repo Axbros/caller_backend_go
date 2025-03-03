@@ -25,5 +25,6 @@ var (
 	ErrCreateOrUpdate                 = errcode.NewError(distributionBaseCode+11, "create or update wrong")
 	ErrClientIDNotFound               = errcode.NewError(distributionBaseCode+12, "client id is not found")
 	ErrGetParent                      = errcode.NewError(distributionBaseCode+13, "get parent err")
+	ErrActiveByID                     = errcode.NewError(distributionBaseCode+14, "ErrActiveByID")
 	// error codes are globally unique, adding 1 to the previous error code
 )

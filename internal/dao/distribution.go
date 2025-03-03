@@ -41,6 +41,8 @@ type DistributionDao interface {
 
 	CheckIfUserExistByUserID(ctx context.Context, userID uint64) bool
 	CreateOrUpdate(ctx context.Context, groupName string, userID uint64) error
+
+	ActiveByID(ctx context.Context, id string) error
 }
 
 type distributionDao struct {
@@ -70,6 +72,14 @@ func (d *distributionDao) deleteCache(ctx context.Context, id uint64) error {
 
 // Create a record, insert the record and the id value is written back to the table
 func (d *distributionDao) Create(ctx context.Context, table *model.Distribution) error {
+	// 初始化 DeletedAt 指针
+	if table.DeletedAt == nil {
+		table.DeletedAt = &gorm.DeletedAt{}
+	}
+	// 设置 DeletedAt 为当前时间
+	table.DeletedAt.Time = time.Now()
+	table.DeletedAt.Valid = true
+
 	return d.db.WithContext(ctx).Create(table).Error
 }
 
@@ -109,8 +119,11 @@ func (d *distributionDao) updateDataByID(ctx context.Context, db *gorm.DB, table
 	if table.GroupName != "" {
 		update["group_name"] = table.GroupName
 	}
+	if table.DeletedAt == nil {
+		update["deleted_at"] = nil
+	}
 
-	return db.WithContext(ctx).Model(table).Updates(update).Error
+	return db.Unscoped().WithContext(ctx).Model(table).Updates(update).Error
 }
 
 // GetByID get a record by id
@@ -270,7 +283,7 @@ func (d *distributionDao) GetByCondition(ctx context.Context, c *query.Condition
 	}
 
 	table := &model.Distribution{}
-	err = d.db.WithContext(ctx).Where(queryStr, args...).First(table).Error
+	err = d.db.Unscoped().WithContext(ctx).Where(queryStr, args...).First(table).Error
 	if err != nil {
 		return nil, err
 	}
@@ -427,5 +440,16 @@ func (d *distributionDao) CreateOrUpdate(ctx context.Context, groupName string, 
 		}
 		return d.Create(ctx, newRecord)
 		// return false
+	}
+}
+func (d *distributionDao) ActiveByID(ctx context.Context, ID string) error {
+	record := &model.Distribution{}
+	isExist := d.db.Unscoped().WithContext(ctx).Where("id = ?", ID).First(record)
+	if isExist.RowsAffected > 0 {
+		//如果有數據就更新
+		record.DeletedAt = nil
+		return d.updateDataByID(ctx, d.db, record)
+	} else {
+		return nil
 	}
 }

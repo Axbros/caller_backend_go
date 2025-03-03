@@ -32,6 +32,8 @@ type DistributionObjDetail struct {
 	GroupName string    `json:"groupName"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+	DeletedAt time.Time `json:"deletedAt"`
+	IsActive  bool      `json:"isActive"`
 }
 
 // CreateDistributionRespond only for api docs
@@ -117,4 +119,8 @@ type ListDistributionsByIDsRespond struct {
 	Data struct {
 		Distributions []DistributionObjDetail `json:"distributions"`
 	} `json:"data"` // return data
+}
+
+type ActiveByIDRequest struct {
+	ID string `json:"id" binding:""` // uint64 id
 }
